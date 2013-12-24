@@ -7,6 +7,8 @@
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
 
+var hexpp = require('./hexpp').defaults({bigendian: true})
+
 module.exports = Sha
 
 function Sha () {
@@ -34,7 +36,8 @@ function Sha () {
 
 Sha.write = write
 Sha.reverseByteOrder = reverseByteOrder
-
+Sha.toHex = toHex
+Sha.Uint32toHex = Uint32toHex
 
 function write (buffer, string, enc, start, from, to, LE) {
 
@@ -52,13 +55,28 @@ function write (buffer, string, enc, start, from, to, LE) {
 }
 
 
+function toHex (buf, groups) {
+  buf = buf.buffer || buf
+  var s = ''
+  for(var i = 0; i < buf.byteLength; i++)
+    s += ((buf[i]>>4).toString(16)) + ((buf[i]&0xf).toString(16)) + (groups-1==i%groups ? ' ' : '')
+  return s
+}
+
+
 function reverseByteOrder(n) {
   return (
-    ((n & 0xff) << 24)
-  | ((n & 0xff00) << 8)
-  | ((n & 0xff0000) >>  8)
-  | ((n & 0xff000000) >>  24)
+    ((n << 24) & 0xff000000)
+  | ((n <<  8) & 0x00ff0000)
+  | ((n >>  8) & 0x0000ff00)
+  | ((n >> 24) & 0x000000ff)
   )
+}
+
+//always fill to the end!
+function zeroFill(buf, from) {
+  for(var i = from; i < buf.byteLength; i++)
+    buf[i] = 0
 }
 
 Sha.prototype.update = function (data, enc) {
@@ -74,12 +92,17 @@ Sha.prototype.update = function (data, enc) {
 
   //for now, assume ascii.
   var start = this._l || 0
-  this._len += data.length
-  console.log('update', this._len)
-  if(data.length < 512 - start) {
-    this._l = Math.min(512, start + data.length)
+
+  console.log('update', this._len, data.length, start)
+
+  if(data.length <= 16*4 - start) {
+    this._l = Math.min(16*4, start + data.length)
+    this._len += this._l
     write(this._x.buffer, data, 'ascii', start, 0, this._l)
   }
+
+  console.log('---WRITTEN---')
+  console.log(hexpp(this._x))
   return this
 }
 
@@ -87,23 +110,70 @@ Sha.prototype.final = function () {
   //do the sha stuff to the end of the message array.
   console.log('final', this._len)
   var x = this._x, len = this._len*8
-  console.log('x[len >> 5]', x[len >> 5], x[len >> 5] | (0x80 << (24 - len % 32))) | 0
-  x[len >> 5] |= 0x80 << (24 - len % 32);
-  console.log('x[len >> 5]', x[len >> 5], x[len >> 5] | (0x80 << (24 - len % 32))) | 0
-  console.log(this._x)
-  x[((len + 64 >> 9) << 4) + 15] = len;
-  console.log(toHex(this._x))
+  
+  console.log('length written:', len, this._len, 'too long?', len > 448, 'extra', 448 - (len % 512))
+  //if
+  //if there is *any* space, fill it, and _update that round.
+  console.log('--- final ---')
+  console.log(hexpp(x))
+
+    if(len === 0) {
+      //try doing nothing? YUSS
+    }
+    else if(len % 512 > 448) {
+      console.log('FILL OVERFLOW')
+//      zeroFill(this._x.buffer, (len % 512)/8)
+      x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
+      //len = this._len += (len % 512)
+      //compute that hash...
+      //OH, i guess we better append the final bit here!
+      this._update()
+      zeroFill(this._x, 0)
+      //len = this._len += 448
+    }
+    //edge case where message is multiple of 512 bits long
+    else if(len % 512 <= 448) {
+      console.log('REMAINER', (len % 512) - 448)
+      if((len % 512) - 448) {
+        console.log('ZERO FILL', len % 512)
+        zeroFill(this._x, (len % 512))
+        x[(len % 512) >> 5] |= 0x80 << (24 - (len % 512) % 32);
+      }
+        x[(len % 512) >> 5] |= 0x80 << (24 - (len % 512) % 32);
+    }
+    else if(len % 512 === 0) {
+      console.log('FIT TO w')
+      this._update()
+      zeroFill(this._x.buffer, 0)
+      //len = this._len += 448
+    }
+    else {
+      console.log('OH NOES', len, len % 512)
+    }
+
+  x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
+
+//  x[(((len % 512) + 64 >> 9) << 4) + 15] = len;
+
+  console.log('--- addBit ---')
+  console.log(hexpp(x))
+  x[15] = len
+  console.log('--- addLed ---')
+  console.log(hexpp(x))
   this._update()
   return this
 }
 
-function toHex (buf) {
-  buf = buf.buffer || buf
-  var s = ''
-  for(var i = 0; i < buf.byteLength; i++)
-    s += ((buf[i]>>4).toString(16)) + ((buf[i]&0xf).toString(16))
+function Uint32toHex (n) {
+var s = (n & 0x0f).toString(16)
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
+  s = ((n >>= 4) & 0x0f).toString(16) + s
   return s
-
 }
 
 Sha.prototype.digest = function () {
@@ -112,6 +182,7 @@ Sha.prototype.digest = function () {
   var h = this._h
 
   //reverse byte order, so that the individual bytes are in correct order.
+  console.log(hexpp(this._h.buffer))
   h[0] = reverseByteOrder(h[0])
   h[1] = reverseByteOrder(h[1])
   h[2] = reverseByteOrder(h[2])
@@ -120,6 +191,7 @@ Sha.prototype.digest = function () {
 
   return toHex(this._h.buffer)
 }
+
 
 // assume that array is a Uint32Array with length=16,
 // and that if it is the last block, it already has the length and the 1 bit appended.
@@ -142,7 +214,9 @@ Sha.prototype._update = function (array) {
   var i = 0
   var w = this._w
   var x = this._x
-console.log('INIT-sha1', toHex(new Int32Array([a, b, c, d, e])))
+
+  console.log('--- Update ---')
+  console.log(hexpp(x))
 
   for(var j = 0; j < 80; j++)
   {
@@ -156,67 +230,12 @@ console.log('INIT-sha1', toHex(new Int32Array([a, b, c, d, e])))
     b = a;
     a = t;
   }
-  console.log('ROUND-sha1', toHex(new Int32Array([a, b, c, d, e])))
 
   h[A] = safe_add(a, _a);
   h[B] = safe_add(b, _b);
   h[C] = safe_add(c, _c);
   h[D] = safe_add(d, _d);
   h[E] = safe_add(e, _e);
-
-}
-
-/*
- * Calculate the SHA-1 of an array of big-endian words, and a bit length
- */
-function core_sha1(x, len)
-{
-  /* append padding */
-  x[len >> 5] |= 0x80 << (24 - len % 32);
-  x[((len + 64 >> 9) << 4) + 15] = len;
-
-  console.log('INIT-core', toHex(x))
-
-  var w = Array(80);
-  var a =  1732584193;
-  var b = -271733879;
-  var c = -1732584194;
-  var d =  271733878;
-  var e = -1009589776;
-
-  console.log('INIT', toHex(new Int32Array([a, b, c, d, e])))
-
-  for(var i = 0; i < x.length; i += 16)
-  {
-    var olda = a;
-    var oldb = b;
-    var oldc = c;
-    var oldd = d;
-    var olde = e;
-
-    for(var j = 0; j < 80; j++)
-    {
-      if(j < 16) w[j] = x[i + j];
-      else w[j] = rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
-      var t = safe_add(safe_add(rol(a, 5), sha1_ft(j, b, c, d)),
-                       safe_add(safe_add(e, w[j]), sha1_kt(j)));
-      e = d;
-      d = c;
-      c = rol(b, 30);
-      b = a;
-      a = t;
-    }
-    console.log('ROUND-core', toHex(new Int32Array([a, b, c, d, e])))
-
-    a = safe_add(a, olda);
-    b = safe_add(b, oldb);
-    c = safe_add(c, oldc);
-    d = safe_add(d, oldd);
-    e = safe_add(e, olde);
-  }
-
-//  return [a, b, c, d, e]
-  return new Int32Array([a, b, c, d, e]);
 
 }
 
