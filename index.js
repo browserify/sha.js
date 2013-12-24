@@ -119,10 +119,9 @@ Sha.prototype.final = function () {
 
     if(len === 0) {
       //try doing nothing? YUSS
+      x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
     }
     else if(len % 512 > 448) {
-      console.log('FILL OVERFLOW')
-//      zeroFill(this._x.buffer, (len % 512)/8)
       x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
       //len = this._len += (len % 512)
       //compute that hash...
@@ -151,7 +150,6 @@ Sha.prototype.final = function () {
       console.log('OH NOES', len, len % 512)
     }
 
-  x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
 
 //  x[(((len % 512) + 64 >> 9) << 4) + 15] = len;
 
