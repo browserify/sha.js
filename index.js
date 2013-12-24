@@ -108,53 +108,30 @@ Sha.prototype.update = function (data, enc) {
 
 Sha.prototype.final = function () {
   //do the sha stuff to the end of the message array.
-  console.log('final', this._len)
   var x = this._x, len = this._len*8
   
-  console.log('length written:', len, this._len, 'too long?', len > 448, 'extra', 448 - (len % 512))
-  //if
-  //if there is *any* space, fill it, and _update that round.
   console.log('--- final ---')
   console.log(hexpp(x))
 
-    if(len === 0) {
-      //try doing nothing? YUSS
-      x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
-    }
-    else if(len % 512 > 448) {
-      x[(len % 512) >> 5] |= (0x80 << (24 - len % 32));
-      //len = this._len += (len % 512)
-      //compute that hash...
-      //OH, i guess we better append the final bit here!
-      this._update()
-      zeroFill(this._x, 0)
-      //len = this._len += 448
-    }
-    //edge case where message is multiple of 512 bits long
-    else if(len % 512 <= 448) {
-      console.log('REMAINER', (len % 512) - 448)
-      if((len % 512) - 448) {
-        console.log('ZERO FILL', len % 512)
-        zeroFill(this._x, (len % 512))
-        x[(len % 512) >> 5] |= 0x80 << (24 - (len % 512) % 32);
-      }
-        x[(len % 512) >> 5] |= 0x80 << (24 - (len % 512) % 32);
-    }
-    else if(len % 512 === 0) {
-      console.log('FIT TO w')
-      this._update()
-      zeroFill(this._x.buffer, 0)
-      //len = this._len += 448
-    }
-    else {
-      console.log('OH NOES', len, len % 512)
-    }
+  var bits = len % 512
+  var append = bits >> 5
+  var bit = (0x80 << (24 - len % 32))
+  if(len === 0 || (bits && bits < 448)) {
+    x[append] |= bit;
+  }
+  else if(bits >= 448) {
+    x[append] |= bit;
+    this._update()
+    zeroFill(this._x, 0)
+  }
+  //edge case where message is multiple of 512 bits long
+  else if(bits === 0) {
+    this._update()
+    zeroFill(this._x.buffer, 0)
+    //len = this._len += 448
+    x[append] |= bit;
+  }
 
-
-//  x[(((len % 512) + 64 >> 9) << 4) + 15] = len;
-
-  console.log('--- addBit ---')
-  console.log(hexpp(x))
   x[15] = len
   console.log('--- addLed ---')
   console.log(hexpp(x))
