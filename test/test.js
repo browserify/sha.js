@@ -18,7 +18,10 @@ var inputs = [
  ['abc', 'ascii'],
  ['123', 'ascii'],
  ['123456789abcdef123456789abcdef123456789abcdef123456789abcdef', 'ascii'],
- ['123456789abcdef123456789abcdef123456789abcdef123456789\x12\x34\x56', 'ascii']
+ ['123456789abcdef123456789abcdef123456789abcdef123456789abc', 'ascii'],
+ ['123456789abcdef123456789abcdef123456789abcdef123456789ab', 'ascii'],
+ ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde', 'ascii'],
+ ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'ascii']
 ]
 
 tape("hash is the same as node's crypto", function (t) {
