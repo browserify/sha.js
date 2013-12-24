@@ -1,0 +1,19 @@
+{
+  "name": "sha.js",
+  "description": "streaming sha1 hash in pure javascript",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dominictarr/sha.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dominictarr/sha.js.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tape": "~2.3.2"
+  },
+  "scripts": {
+    "test": "set -e; for t in test/*.js; do node $t; done"
+  },
+  "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
+  "license": "MIT"
+}

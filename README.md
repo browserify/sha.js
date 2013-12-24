@@ -1,0 +1,6 @@
+# sha.js
+
+
+## License
+
+MIT
