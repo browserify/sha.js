@@ -18,22 +18,33 @@ var Hash = require('./hash')
 
 inherits(Sha, Hash)
 
+var q = false
+var A = 0
+var B = 4
+var C = 8
+var D = 12
+var E = 16
+
+var BE = false
+var LE = true
+
 function Sha () {
   
   //|0 coearses to Int32
   var h = this._h = new Uint32Array(5)
 
-  h[0] = 0x67452301|0
-  h[1] = 0xefcdab89|0
-  h[2] = 0x98badcfe|0
-  h[3] = 0x10325476|0
-  h[4] = 0xc3d2e1f0|0
   this._w = new Uint32Array(80)
   Hash.call(this, 16*4)
 
   this._dvX = new DataView(this._block.buffer)
   this._dvW = new DataView(this._w.buffer)
-  this._dvH = new DataView(this._h.buffer)
+  var H = this._dvH = new DataView(this._h.buffer)
+
+  H.setUint32(A, 0x01234567, LE)
+  H.setUint32(B, 0x89abcdef, LE)
+  H.setUint32(C, 0xfedcba98, LE)
+  H.setUint32(D, 0x76543210, LE)
+  H.setUint32(E, 0xf0e1d2c3, LE)
 
   this._x = this._block
   this._len = 0
@@ -76,12 +87,6 @@ Sha.prototype._final = function () {
   //reorder bytes to little endian...
   var h = this._h
   console.log(hexpp(this._h.buffer))
-//  h[0] = reverseByteOrder(h[0])
-//  h[1] = reverseByteOrder(h[1])
-//  h[2] = reverseByteOrder(h[2])
-//  h[3] = reverseByteOrder(h[3])
-//  h[4] = reverseByteOrder(h[4])
-//
   return this
 }
 
@@ -89,28 +94,18 @@ Sha.prototype._final = function () {
 // assume that array is a Uint32Array with length=16,
 // and that if it is the last block, it already has the length and the 1 bit appended.
 
-var A = 0
-var B = 4
-var C = 8
-var D = 12
-var E = 16
-
-var BE = true
-
 Sha.prototype._update = function (array) {
-
-  var q = false
 
   var X = this._dvX
   var W = this._dvW
   var H = this._dvH
   
   var h = this._h
-  var a = _a = H.getUint32(A, q)
-  var b = _b = H.getUint32(B, q)
-  var c = _c = H.getUint32(C, q)
-  var d = _d = H.getUint32(D, q)
-  var e = _e = H.getUint32(E, q)
+  var a = _a = H.getUint32(A, BE)
+  var b = _b = H.getUint32(B, BE)
+  var c = _c = H.getUint32(C, BE)
+  var d = _d = H.getUint32(D, BE)
+  var e = _e = H.getUint32(E, BE)
 
   var i = 0
   var w = this._w
@@ -122,15 +117,15 @@ Sha.prototype._update = function (array) {
   for(var j = 0; j < 80; j++)
   {
     if(j < 16)
-      W.setUint32(j*4, X.getUint32((i + j)*4, BE), BE)
+      W.setUint32(j*4, X.getUint32((i + j)*4, LE), LE)
     else
       W.setUint32(
         j*4,
         rol(
-          W.getUint32((j -  3)*4, BE)
-        ^ W.getUint32((j -  8)*4, BE)
-        ^ W.getUint32((j - 14)*4, BE)
-        ^ W.getUint32((j - 16)*4, BE),
+          W.getUint32((j -  3)*4, LE)
+        ^ W.getUint32((j -  8)*4, LE)
+        ^ W.getUint32((j - 14)*4, LE)
+        ^ W.getUint32((j - 16)*4, LE),
         1),
         true
       )
@@ -142,7 +137,7 @@ Sha.prototype._update = function (array) {
           sha1_ft(j, b, c, d)
         ),
         safe_add(
-          safe_add(e, W.getUint32(j*4, BE)),
+          safe_add(e, W.getUint32(j*4, LE)),
           sha1_kt(j)
         )
       );
@@ -154,18 +149,11 @@ Sha.prototype._update = function (array) {
     a = t
   }
 
-  H.setUint32(A, safe_add(a, _a), q)
-  H.setUint32(B, safe_add(b, _b), q)
-  H.setUint32(C, safe_add(c, _c), q)
-  H.setUint32(D, safe_add(d, _d), q)
-  H.setUint32(E, safe_add(e, _e), q)
-
-//  h[0] = safe_add(a, _a)
-//  h[1] = safe_add(b, _b)
-//  h[2] = safe_add(c, _c)
-//  h[3] = safe_add(d, _d)
-//  h[4] = safe_add(e, _e)
-  
+  H.setUint32(A, safe_add(a, _a), BE)
+  H.setUint32(B, safe_add(b, _b), BE)
+  H.setUint32(C, safe_add(c, _c), BE)
+  H.setUint32(D, safe_add(d, _d), BE)
+  H.setUint32(E, safe_add(e, _e), BE)
 }
 
 /*
