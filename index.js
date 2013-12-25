@@ -99,16 +99,18 @@ var BE = true
 
 Sha.prototype._update = function (array) {
 
+  var q = true
+
   var X = this._dvX
   var W = this._dvW
   var H = this._dvH
   
   var h = this._h
-  var a = _a = H.getUint32(A, BE)
-  var b = _b = H.getUint32(B, BE)
-  var c = _c = H.getUint32(C, BE)
-  var d = _d = H.getUint32(D, BE)
-  var e = _e = H.getUint32(E, BE)
+  var a = _a = H.getUint32(A, q)
+  var b = _b = H.getUint32(B, q)
+  var c = _c = H.getUint32(C, q)
+  var d = _d = H.getUint32(D, q)
+  var e = _e = H.getUint32(E, q)
 
   var i = 0
   var w = this._w
@@ -152,11 +154,18 @@ Sha.prototype._update = function (array) {
     a = t
   }
 
-  H.setUint32(A, safe_add(a, _a), BE)
-  H.setUint32(B, safe_add(b, _b), BE)
-  H.setUint32(C, safe_add(c, _c), BE)
-  H.setUint32(D, safe_add(d, _d), BE)
-  H.setUint32(E, safe_add(e, _e), BE)
+  H.setUint32(A, safe_add(a, _a), q)
+  H.setUint32(B, safe_add(b, _b), q)
+  H.setUint32(C, safe_add(c, _c), q)
+  H.setUint32(D, safe_add(d, _d), q)
+  H.setUint32(E, safe_add(e, _e), q)
+//
+//  h[0] = safe_add(a, _a)
+//  h[1] = safe_add(b, _b)
+//  h[2] = safe_add(c, _c)
+//  h[3] = safe_add(d, _d)
+//  h[4] = safe_add(e, _e)
+  
 }
 
 /*
