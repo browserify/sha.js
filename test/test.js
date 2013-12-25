@@ -21,7 +21,8 @@ var inputs = [
  ['123456789abcdef123456789abcdef123456789abcdef123456789abc', 'ascii'],
  ['123456789abcdef123456789abcdef123456789abcdef123456789ab', 'ascii'],
  ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde', 'ascii'],
- ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'ascii']
+ ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'ascii'],
+ ['foobarbaz', 'ascii']
 ]
 
 tape("hash is the same as node's crypto", function (t) {
@@ -36,4 +37,46 @@ tape("hash is the same as node's crypto", function (t) {
 
   t.end()
 
+})
+
+tape('call update multiple times', function (t) {
+  var n = 1
+  inputs.forEach(function (v) {
+    console.log('HASH', v, v[0].length)
+    var hash = new Sha1()
+    var _hash = crypto.createHash('sha1')
+    for(var i = 0; i < v[0].length; i=(i+1)*2) {
+      var s = v[0].substring(i, (i+1)*2)
+      console.log('UPDATE', s)
+      hash.update(s, v[1])
+      _hash.update(s, v[1])
+    }
+    var a = hash.digest('hex')
+    var e = _hash.digest('hex')
+    console.log(a, e)
+    t.equal(a, e)
+  })
+  t.end()
+})
+
+
+tape('call update twice', function (t) {
+
+  var _hash = crypto.createHash('sha1')
+  var hash  = new Sha1()
+
+  _hash.update('foo')
+  hash.update('foo')
+
+  _hash.update('bar')
+  hash.update('bar')
+
+  _hash.update('baz')
+  hash.update('baz')
+
+  var a = hash.digest('hex')
+  var e = _hash.digest('hex')
+
+  t.equal(a, e)
+  t.end()
 })
