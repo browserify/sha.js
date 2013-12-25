@@ -1,7 +1,5 @@
-
-
-var reverseByteOrder = require('../').reverseByteOrder
-var Uint32toHex = require('../').Uint32toHex
+var reverseByteOrder = require('../util').reverseByteOrder
+var Uint32toHex = require('../util').Uint32toHex
 
 var tape = require('tape')
 
