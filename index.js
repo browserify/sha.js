@@ -9,55 +9,38 @@
 var hexpp = require('./hexpp').defaults({bigendian: true})
 
 var u = require('./util')
-var write = u.write
 var reverseByteOrder = u.reverseByteOrder
-var toHex = u.toHex
 var zeroFill = u.zeroFill
 module.exports = Sha
+
+var inherits = require('util').inherits
+var Hash = require('./hash')
+
+inherits(Sha, Hash)
 
 function Sha () {
   
   //|0 coearses to Int32
   var h = this._h = new Uint32Array(5)
+
   h[0] = 0x67452301|0
   h[1] = 0xefcdab89|0
   h[2] = 0x98badcfe|0
   h[3] = 0x10325476|0
   h[4] = 0xc3d2e1f0|0
-
   this._w = new Uint32Array(80)
-  this._x = new Uint32Array(16)
+  Hash.call(this, 16*4)
+
+  this._dvX = new DataView(this._block.buffer)
+  this._dvW = new DataView(this._w.buffer)
+  this._dvH = new DataView(this._h.buffer)
+
+  this._x = this._block
   this._len = 0
 
 }
 
-Sha.prototype.update = function (data, enc) {
-  //convert to array of ints.
-  //since this is probably a string, copy it into the array,
-  //if it's over 16 words (and so, we have filled _i)
-  //then call _update(). if it's equal less, we have to wait,
-  //because this might be the last block, and so we have to wait for final()
-
-  //for encoding/decoding utf8, see here:
-  //https://github.com/chrisdickinson/bops/blob/master/typedarray/from.js#L36-L57
-  //https://github.com/chrisdickinson/to-utf8
-
-  //for now, assume ascii.
-  var start = this._l || 0
-  this._len += data.length
-  console.log('update', JSON.stringify(data), start, data.length)
-
-  if(data.length <= 16*4 - start) {
-    write(this._x.buffer, data, 'ascii', start, 0, data.length)
-    this._l = (this._l || 0) + data.length
-  }
-
-  console.log('---WRITTEN---')
-  console.log(hexpp(this._x))
-  return this
-}
-
-Sha.prototype.final = function () {
+Sha.prototype._final = function () {
   //do the sha stuff to the end of the message array.
   var x = this._x, len = this._len*8
   
@@ -89,15 +72,9 @@ Sha.prototype.final = function () {
   console.log('--- addLed ---')
   console.log(hexpp(x))
   this._update()
-  return this
-}
 
-Sha.prototype.digest = function () {
-  this.final()
-
+  //reorder bytes to little endian...
   var h = this._h
-
-  //reverse byte order, so that the individual bytes are in correct order.
   console.log(hexpp(this._h.buffer))
   h[0] = reverseByteOrder(h[0])
   h[1] = reverseByteOrder(h[1])
@@ -105,7 +82,7 @@ Sha.prototype.digest = function () {
   h[3] = reverseByteOrder(h[3])
   h[4] = reverseByteOrder(h[4])
 
-  return toHex(this._h.buffer)
+  return this
 }
 
 
@@ -113,19 +90,25 @@ Sha.prototype.digest = function () {
 // and that if it is the last block, it already has the length and the 1 bit appended.
 
 var A = 0
-var B = 1
-var C = 2
-var D = 3
-var E = 4
+var B = 4
+var C = 8
+var D = 12
+var E = 16
+
+var BE = true
 
 Sha.prototype._update = function (array) {
 
+  var X = this._dvX
+  var W = this._dvW
+  var H = this._dvH
+  
   var h = this._h
-  var a = _a = h[A]
-  var b = _b = h[B]
-  var c = _c = h[C]
-  var d = _d = h[D]
-  var e = _e = h[E]
+  var a = _a = H.getUint32(A, BE)
+  var b = _b = H.getUint32(B, BE)
+  var c = _c = H.getUint32(C, BE)
+  var d = _d = H.getUint32(D, BE)
+  var e = _e = H.getUint32(E, BE)
 
   var i = 0
   var w = this._w
@@ -136,23 +119,44 @@ Sha.prototype._update = function (array) {
 
   for(var j = 0; j < 80; j++)
   {
-    if(j < 16) w[j] = x[i + j];
-    else w[j] = rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
-    var t = safe_add(safe_add(rol(a, 5), sha1_ft(j, b, c, d)),
-                     safe_add(safe_add(e, w[j]), sha1_kt(j)));
-    e = d;
-    d = c;
-    c = rol(b, 30);
-    b = a;
-    a = t;
+    if(j < 16)
+      W.setUint32(j*4, X.getUint32((i + j)*4, BE), BE)
+    else
+      W.setUint32(
+        j*4,
+        rol(
+          W.getUint32((j -  3)*4, BE)
+        ^ W.getUint32((j -  8)*4, BE)
+        ^ W.getUint32((j - 14)*4, BE)
+        ^ W.getUint32((j - 16)*4, BE),
+        1),
+        true
+      )
+
+    var t =
+      safe_add(
+        safe_add(
+          rol(a, 5),
+          sha1_ft(j, b, c, d)
+        ),
+        safe_add(
+          safe_add(e, W.getUint32(j*4, BE)),
+          sha1_kt(j)
+        )
+      );
+
+    e = d
+    d = c
+    c = rol(b, 30)
+    b = a
+    a = t
   }
 
-  h[A] = safe_add(a, _a);
-  h[B] = safe_add(b, _b);
-  h[C] = safe_add(c, _c);
-  h[D] = safe_add(d, _d);
-  h[E] = safe_add(e, _e);
-
+  H.setUint32(A, safe_add(a, _a), BE)
+  H.setUint32(B, safe_add(b, _b), BE)
+  H.setUint32(C, safe_add(c, _c), BE)
+  H.setUint32(D, safe_add(d, _d), BE)
+  H.setUint32(E, safe_add(e, _e), BE)
 }
 
 /*
