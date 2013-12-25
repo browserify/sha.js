@@ -6,9 +6,13 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
-
 var hexpp = require('./hexpp').defaults({bigendian: true})
 
+var u = require('./util')
+var write = u.write
+var reverseByteOrder = u.reverseByteOrder
+var toHex = u.toHex
+var zeroFill = u.zeroFill
 module.exports = Sha
 
 function Sha () {
@@ -24,59 +28,7 @@ function Sha () {
   this._w = new Uint32Array(80)
   this._x = new Uint32Array(16)
   this._len = 0
-}
 
-
-//write a string into an array, in either big or little endian mode.
-//you can create a Uint32 view on bytes with typed arrays,
-//new Uint32Array(uint8array.buffer)
-//but unfortunately, it's littleendian.
-//(as far as I can tell, am offline currently,
-// will look up docs when connected)
-
-Sha.write = write
-Sha.reverseByteOrder = reverseByteOrder
-Sha.toHex = toHex
-Sha.Uint32toHex = Uint32toHex
-
-function write (buffer, string, enc, start, from, to, LE) {
-
-  if(enc !== 'ascii')
-    throw new Error('only ascii is supported, for now')
-
-  var l = to - from
-
-  for( var i = 0; i < l; i++) {
-    //iterate in bigendian order.
-    var byte = (i&0xfffffffc)|(LE ? i%4 : 3 - i%4)
-    buffer[start + byte] = string.charCodeAt(i + from)
-  }
-
-}
-
-
-function toHex (buf, groups) {
-  buf = buf.buffer || buf
-  var s = ''
-  for(var i = 0; i < buf.byteLength; i++)
-    s += ((buf[i]>>4).toString(16)) + ((buf[i]&0xf).toString(16)) + (groups-1==i%groups ? ' ' : '')
-  return s
-}
-
-
-function reverseByteOrder(n) {
-  return (
-    ((n << 24) & 0xff000000)
-  | ((n <<  8) & 0x00ff0000)
-  | ((n >>  8) & 0x0000ff00)
-  | ((n >> 24) & 0x000000ff)
-  )
-}
-
-//always fill to the end!
-function zeroFill(buf, from) {
-  for(var i = from; i < buf.byteLength; i++)
-    buf[i] = 0
 }
 
 Sha.prototype.update = function (data, enc) {
@@ -92,13 +44,12 @@ Sha.prototype.update = function (data, enc) {
 
   //for now, assume ascii.
   var start = this._l || 0
-
-  console.log('update', this._len, data.length, start)
+  this._len += data.length
+  console.log('update', JSON.stringify(data), start, data.length)
 
   if(data.length <= 16*4 - start) {
-    this._l = Math.min(16*4, start + data.length)
-    this._len += this._l
-    write(this._x.buffer, data, 'ascii', start, 0, this._l)
+    write(this._x.buffer, data, 'ascii', start, 0, data.length)
+    this._l = (this._l || 0) + data.length
   }
 
   console.log('---WRITTEN---')
@@ -110,12 +61,14 @@ Sha.prototype.final = function () {
   //do the sha stuff to the end of the message array.
   var x = this._x, len = this._len*8
   
-  console.log('--- final ---')
-  console.log(hexpp(x))
-
   var bits = len % 512
   var append = bits >> 5
   var bit = (0x80 << (24 - len % 32))
+  console.log(bit, append, bits)
+
+  console.log('--- final ---')
+  console.log(hexpp(x))
+
   if(len === 0 || (bits && bits < 448)) {
     x[append] |= bit;
   }
@@ -137,18 +90,6 @@ Sha.prototype.final = function () {
   console.log(hexpp(x))
   this._update()
   return this
-}
-
-function Uint32toHex (n) {
-var s = (n & 0x0f).toString(16)
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  s = ((n >>= 4) & 0x0f).toString(16) + s
-  return s
 }
 
 Sha.prototype.digest = function () {
@@ -254,19 +195,3 @@ function rol(num, cnt)
   return (num << cnt) | (num >>> (32 - cnt));
 }
 
-if(!module.parent) {
-  var crypto = require('crypto')
-  var _H = new Sha().update('hello there.', 'ascii').digest('hex')
-  var H2 = crypto.createHash('sha1').update('hello there.', 'ascii').digest('hex')
-  console.error('SHA1', _H)
-  var a = new Uint32Array(16)
-
-  write(a.buffer, 'hello there.', 'ascii', 0, 0, 12)
-  console.error('buff-xxxx', toHex(a.buffer))
-  var H = toHex(core_sha1(a, 12*8))
-  console.error('CORE', H)
-  console.error('OSSL', H2)
-
-  if(H === _H && H === H2)
-    console.log('SUCCESS!')
-}
