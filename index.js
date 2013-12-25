@@ -76,12 +76,12 @@ Sha.prototype._final = function () {
   //reorder bytes to little endian...
   var h = this._h
   console.log(hexpp(this._h.buffer))
-  h[0] = reverseByteOrder(h[0])
-  h[1] = reverseByteOrder(h[1])
-  h[2] = reverseByteOrder(h[2])
-  h[3] = reverseByteOrder(h[3])
-  h[4] = reverseByteOrder(h[4])
-
+//  h[0] = reverseByteOrder(h[0])
+//  h[1] = reverseByteOrder(h[1])
+//  h[2] = reverseByteOrder(h[2])
+//  h[3] = reverseByteOrder(h[3])
+//  h[4] = reverseByteOrder(h[4])
+//
   return this
 }
 
@@ -99,7 +99,7 @@ var BE = true
 
 Sha.prototype._update = function (array) {
 
-  var q = true
+  var q = false
 
   var X = this._dvX
   var W = this._dvW
@@ -159,7 +159,7 @@ Sha.prototype._update = function (array) {
   H.setUint32(C, safe_add(c, _c), q)
   H.setUint32(D, safe_add(d, _d), q)
   H.setUint32(E, safe_add(e, _e), q)
-//
+
 //  h[0] = safe_add(a, _a)
 //  h[1] = safe_add(b, _b)
 //  h[2] = safe_add(c, _c)
