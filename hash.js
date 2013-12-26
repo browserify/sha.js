@@ -20,40 +20,30 @@ Hash.prototype.update = function (data, enc) {
   //for encoding/decoding utf8, see here:
   //https://github.com/chrisdickinson/bops/blob/master/typedarray/from.js#L36-L57
   //https://github.com/chrisdickinson/to-utf8
-
-  //for now, assume ascii.
-  var start = this._l || 0
-  this._len += data.length
-  console.log('update', JSON.stringify(data), start, data.length)
   var bl = this._block.byteLength
+  //for now, assume ascii.
 
-  if(data.length <= bl - start) {
-    u.write(this._x.buffer, data, 'ascii', start, 0, data.length)
-    this._l = (this._l || 0) + data.length
+  var l = this._len += data.length
+  var s = this._s = (this._s || 0)
+  var f = 0
+  while(s < l) {
+    var t = Math.min(data.length, f + bl)
+    u.write(this._block.buffer, data, 'ascii', l%bl, f, t)
+    s += (t - f)
+    if(!(s%bl))
+      this._update(this._block.buffer)
   }
-  else {
-    var from = 0
-    var to = (from + bl) - this._l
-    while(from < data.length) {
-      console.log('OVERFLOW')
-      u.write(this._x.buffer, data, 'ascii', this._l % bl, from, to)
-      from = to
-      to = Math.min(bl - this._l, data.length)
-      this._update()
-      this._l = 0
-    }
-  }
+
   console.log('---WRITTEN---')
-  console.log(hexpp(this._x))
+  console.log(hexpp(this._block))
   return this
 
 }
 
 Hash.prototype.digest = function (enc) {
-  this._final()
+  return u.toHex(this._final())
   //reverse byte order, so that the individual bytes are in correct order.
-  return u.toHex(this._h.buffer)
-
+//  return u.toHex(this._hash.buffer)
 }
 
 Hash.prototype._update = function () {
