@@ -22,7 +22,9 @@ function write (buffer, string, enc, start, from, to, LE) {
     //iterate in bigendian order.
     var j = start + i
     var byte = (j&0xfffffffc)|(LE ? j%4 : 3 - j%4)
-    console.log('byte', byte, string[i + from], string.charCodeAt(i + from).toString(16))
+    console.log('byte', byte, string[i + from],
+      string.charCodeAt(i + from),
+      string.charCodeAt(i + from).toString(16))
     buffer[byte] = string.charCodeAt(i + from)
   }
 
