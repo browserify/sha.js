@@ -1,11 +1,13 @@
 var u = require('./util')
-var hexpp = require('./hexpp')
+var hexpp = require('./hexpp').defaults({bigendian: true})
 
 module.exports = Hash
 
 //prototype class for hash functions
-function Hash (blockSize) {
+function Hash (blockSize, finalSize) {
   this._block = new Uint32Array(blockSize/4)
+  this._dv = new DataView(this._block.buffer)
+  this._finalSize = finalSize
   this._len = 0
   this._l = 0
 }
@@ -28,22 +30,46 @@ Hash.prototype.update = function (data, enc) {
   var f = 0
   while(s < l) {
     var t = Math.min(data.length, f + bl)
-    u.write(this._block.buffer, data, 'ascii', l%bl, f, t)
+    u.write(this._block.buffer, data, 'ascii', s%bl, f, t, true)
     s += (t - f)
-    if(!(s%bl))
-      this._update(this._block.buffer)
-  }
 
-  console.log('---WRITTEN---')
-  console.log(hexpp(this._block))
+    if(!(s%bl)) {
+      this._update(this._block.buffer)
+      u.zeroFill(this._block.buffer, 0)
+    }
+
+  }
+  this._s = s
+
   return this
 
 }
 
 Hash.prototype.digest = function (enc) {
-  return u.toHex(this._final())
-  //reverse byte order, so that the individual bytes are in correct order.
-//  return u.toHex(this._hash.buffer)
+  //how much message is leftover
+  var bl = this._block.byteLength
+  var fl = this._finalSize
+  var len = this._len*8
+
+  var x = this._block.buffer
+  var X = this._dv
+
+  var bits = len % bl*8
+
+  //add end marker, so that appending 0's creats a different hash.
+  x[bits >> 4] = 0x80
+
+  console.log('--- final ---')
+  console.log(hexpp(x))
+
+  if(bits >= fl) {
+    this._update(this._block.buffer)
+    zeroFill(this._x, 0)
+  }
+
+  //TODO: handle case where the bit length is > Math.pow(2, 29)
+  X.setUint32(fl + 4, len, false) //big endian
+  return this._update(this._block.buffer)
 }
 
 Hash.prototype._update = function () {
