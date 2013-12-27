@@ -1,8 +1,8 @@
 var tape = require('tape')
 var write = require('../util').write
 var hexpp = require('../hexpp')
-var b64 = require('base64-js')
 var u = require('../util')
+var to = require('bops/typedarray/to')
 
 function toBuffer (string) {
   var a = new Uint8Array(string.length)
@@ -30,9 +30,9 @@ var FOO = toBuffer('foo')
 var BAR = toBuffer('bar')
 var BAZ = toBuffer('baz')
 
-var FOO64 = b64.fromByteArray(FOO)
-var BAR64 = b64.fromByteArray(BAR)
-var BAZ64 = b64.fromByteArray(BAZ)
+var FOO64 = to(FOO, 'base64')
+var BAR64 = to(BAR, 'base64')
+var BAZ64 = to(BAZ, 'base64')
 var FOOx = u.toHex('foo')
 var BARx = u.toHex('bar')
 var BAZx = u.toHex('baz')
