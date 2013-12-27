@@ -7,7 +7,9 @@
     "type": "git",
     "url": "git://github.com/dominictarr/sha.js.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "bops": "~0.1.1"
+  },
   "devDependencies": {
     "tape": "~2.3.2"
   },
