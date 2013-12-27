@@ -4,16 +4,7 @@ var tape = require('tape')
 var from = require('bops/typedarray/from')
 var hexpp = require('../hexpp')
 
-var Sha1 = require('../')
-var Sha256 = require('../sha256')
-
-function createHash(alg) {
-  return (
-      'sha1'   == alg ? new Sha1()
-    : 'sha256' == alg ? new Sha256()
-    : (function () { throw new Error(alg + ' is not supported') }) ()
-  )
-}
+var createHash = require('../')
 
 function makeTest(alg, i, verbose) {
   var v = vectors[i]

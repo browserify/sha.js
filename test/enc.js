@@ -1,4 +1,4 @@
-var Sha1 = require('../')
+var Sha1 = require('../sha1')
 var tape = require('tape')
 var toString = require('../util').toString
 var toBuffer = require('bops/typedarray/from')
