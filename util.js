@@ -3,8 +3,8 @@ exports.reverseByteOrder = reverseByteOrder
 exports.toHex = toHex
 exports.zeroFill = zeroFill
 exports.Uint32toHex = Uint32toHex
-
-
+exports.toString = toString
+var bopsToString = require('bops/typedarray/to')
 //change me: args should be:
 //buffer, string, enc, string_start, buffer_start
 //write will write as much of string into buffer as possible, and return the new length.
@@ -84,3 +84,8 @@ function Uint32toHex (n) {
   return s
 }
 
+
+function toString(buf, enc) {
+  if(null == enc) return buf
+  return bopsToString(buf, enc)
+}
