@@ -80,15 +80,10 @@ Hash.prototype.digest = function (enc) {
   X.setUint32(fl + 4, len, false) //big endian
 
   var hash = this._update(this._block.buffer)
-  return u.toString(hash, enc)
+  return u.toString(new Uint8Array(hash.buffer || hash), enc)
 }
 
 Hash.prototype._update = function () {
   throw new Error('_update must be implemented by subclass')
 }
-
-Hash.prototype._final = function () {
-  throw new Error('_final must be implemented by subclass')
-}
-
 
