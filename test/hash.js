@@ -78,7 +78,7 @@ function makeTest(name, data) {
     }
 
     data.strings.forEach(function (string) {
-      h.update(string)
+      h.update(string, 'ascii')
     })
 
     t.equal(h.digest(), hash)

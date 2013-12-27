@@ -3,6 +3,7 @@ var crypto = require('crypto')
 var tape   = require('tape')
 var Sha1   = require('../')
 var Uint32toHex = Sha1.Uint32toHex
+var u = require('../util')
 
 function generateCount (m) {
   var s = ''
@@ -56,19 +57,20 @@ tape('call update multiple times', function (t) {
   t.end()
 })
 
+
 tape('call update twice', function (t) {
 
   var _hash = crypto.createHash('sha1')
   var hash  = new Sha1()
 
-  _hash.update('foo')
-  hash.update('foo')
+  _hash.update('foo', 'ascii')
+  hash.update('foo', 'ascii')
 
-  _hash.update('bar')
-  hash.update('bar')
+  _hash.update('bar', 'ascii')
+  hash.update('bar', 'ascii')
 
-  _hash.update('baz')
-  hash.update('baz')
+  _hash.update('baz', 'ascii')
+  hash.update('baz', 'ascii')
 
   var a = hash.digest('hex')
   var e = _hash.digest('hex')
@@ -76,4 +78,24 @@ tape('call update twice', function (t) {
   t.equal(a, e)
   t.end()
 })
+
+
+tape('hex encoding', function (t) {
+  var n = 1
+  inputs.forEach(function (v) {
+    var hash = new Sha1()
+    var _hash = crypto.createHash('sha1')
+    for(var i = 0; i < v[0].length; i=(i+1)*2) {
+      var s = v[0].substring(i, (i+1)*2)
+      hash.update(u.toHex(s), 'hex')
+      _hash.update(u.toHex(s), 'hex')
+    }
+    var a = hash.digest('hex')
+    var e = _hash.digest('hex')
+    console.log(a, '==', e)
+    t.equal(a, e)
+  })
+  t.end()
+})
+
 
