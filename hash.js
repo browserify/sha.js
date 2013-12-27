@@ -40,8 +40,8 @@ Hash.prototype.update = function (data, enc) {
   var f = 0
   while(s < l) {
     var t = Math.min(length, f + bl)
-    u.write(this._block.buffer, data, enc, s%bl, f, t, true)
-    s += (t - f)
+    u.write(this._block.buffer, data, enc, s%bl, f, t)
+    var ch = (t - f); s += ch; f += ch
 
     if(!(s%bl)) {
       this._update(this._block.buffer)
@@ -67,9 +67,9 @@ Hash.prototype.digest = function (enc) {
   var bits = len % (bl*8)
 
   //add end marker, so that appending 0's creats a different hash.
+  //console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
+  //console.log(hexpp(x))
   x[this._len % bl] = 0x80
-//  console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
-//  console.log(hexpp(x))
   
   if(bits >= fl*8) {
     this._update(this._block.buffer)
