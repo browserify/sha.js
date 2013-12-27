@@ -98,4 +98,3 @@ tape('hex encoding', function (t) {
   t.end()
 })
 
-
