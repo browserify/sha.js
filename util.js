@@ -1,8 +1,7 @@
 exports.write = write
-exports.reverseByteOrder = reverseByteOrder
 exports.toHex = toHex
 exports.zeroFill = zeroFill
-exports.Uint32toHex = Uint32toHex
+
 exports.toString = toString
 var bopsToString = require('bops/typedarray/to')
 //change me: args should be:
@@ -55,35 +54,11 @@ function toHex (buf) {
   return s
 }
 
-
-function reverseByteOrder(n) {
-  return (
-    ((n << 24) & 0xff000000)
-  | ((n <<  8) & 0x00ff0000)
-  | ((n >>  8) & 0x0000ff00)
-  | ((n >> 24) & 0x000000ff)
-  )
-}
-
 //always fill to the end!
 function zeroFill(buf, from) {
   for(var i = from; i < buf.byteLength; i++)
     buf[i] = 0
 }
-
-
-function Uint32toHex (n) {
-  var s = (n & 0x0f).toString(16)
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-      s = ((n >>= 4) & 0x0f).toString(16) + s
-  return s
-}
-
 
 function toString(buf, enc) {
   if(null == enc) return buf
