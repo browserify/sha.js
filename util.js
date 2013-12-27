@@ -4,38 +4,43 @@ exports.toHex = toHex
 exports.zeroFill = zeroFill
 exports.Uint32toHex = Uint32toHex
 
-//write a string into an array, in either big or little endian mode.
-//you can create a Uint32 view on bytes with typed arrays,
-//new Uint32Array(uint8array.buffer)
-//but unfortunately, it's littleendian.
-//(as far as I can tell, am offline currently,
-// will look up docs when connected)
+
+//change me: args should be:
+//buffer, string, enc, string_start, buffer_start
+//write will write as much of string into buffer as possible, and return the new length.
+//no. that is not enough... because of utf8.
+//HMM
+
+//I think this is just too coupled to be separate.
+//for utf8 you also need the state of the character...
+
+//the simplest way would be to just convert the utf8 to a buffer first.
+//not optimal, though...
+
+//OKAY, I should have benchmarks before I worry about that.
 
 function write (buffer, string, enc, start, from, to, LE) {
 
-  if(enc !== 'ascii')
-    throw new Error('only ascii is supported, for now')
-
   var l = (to - from)
-
-  for( var i = 0; i < l; i++) {
-    //iterate in bigendian order.
-    var j = start + i
-    var byte = (j&0xfffffffc)|(LE ? j%4 : 3 - j%4)
-    console.log('byte', byte, string[i + from],
-      string.charCodeAt(i + from),
-      string.charCodeAt(i + from).toString(16))
-    buffer[byte] = string.charCodeAt(i + from)
+  if(enc === 'ascii') {
+    for( var i = 0; i < l; i++) {
+      buffer[start + i] = string.charCodeAt(i + from)
+    }
   }
-
-}
-
-function toHex (buf, groups) {
-  buf = buf.buffer || buf
-  var s = ''
-  for(var i = 0; i < buf.byteLength; i++)
-    s += ((buf[i]>>4).toString(16)) + ((buf[i]&0xf).toString(16)) + (groups-1==i%groups ? ' ' : '')
-  return s
+  else if(enc == null) {
+    for( var i = 0; i < l; i++) {
+      buffer[start + i] = string[i + from]
+    }
+  }
+  else if(enc === 'hex') {
+    for(var i = 0; i < l; i++) {
+      var j = from + i
+      buffer[start + i] = parseInt(string[j*2] + string[(j*2)+1], 16)
+    }
+  }
+  else if(enc === 'base64') {
+    throw new Error('base64 encoding not yet supported')
+  }
 }
 
 
@@ -64,6 +69,15 @@ function Uint32toHex (n) {
       s = ((n >>= 4) & 0x0f).toString(16) + s
       s = ((n >>= 4) & 0x0f).toString(16) + s
       s = ((n >>= 4) & 0x0f).toString(16) + s
+  return s
+}
+
+function toHex (buf) {
+  var s = '', length = buf.byteLength || buf.length
+  for(var i = 0; i < length; i++) {
+    var char = buf.charCodeAt ? buf.charCodeAt(i) : buf[i]
+    s += (char>>4).toString(16) + ((char & 0x0f)).toString(16)
+  }
   return s
 }
 
