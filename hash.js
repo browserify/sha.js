@@ -1,5 +1,5 @@
 var u = require('./util')
-var hexpp = require('./hexpp').defaults({bigendian: true})
+var hexpp = require('./hexpp').defaults({bigendian: false})
 
 module.exports = Hash
 
@@ -69,7 +69,9 @@ Hash.prototype.digest = function (enc) {
 
   //TODO: handle case where the bit length is > Math.pow(2, 29)
   X.setUint32(fl + 4, len, false) //big endian
-  return this._update(this._block.buffer)
+  var hash = this._update(this._block.buffer)
+  if(!enc) return hash
+  return u.toHex(hash)
 }
 
 Hash.prototype._update = function () {
