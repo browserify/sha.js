@@ -62,5 +62,7 @@ function zeroFill(buf, from) {
 
 function toString(buf, enc) {
   if(null == enc) return buf
+  if('hex' == enc)
+    return toHex(buf)
   return bopsToString(buf, enc)
 }
