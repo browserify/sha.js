@@ -1,6 +1,6 @@
 var u = require('./util')
 var hexpp = require('./hexpp').defaults({bigendian: false})
-
+var toBuffer = require('bops/typedarray/from')
 module.exports = Hash
 
 //prototype class for hash functions
@@ -26,9 +26,14 @@ Hash.prototype.update = function (data, enc) {
   var bl = this._block.byteLength
   //for now, assume ascii.
 
+  //I'd rather do this with a streaming encoder, like the opposite of
+  //http://nodejs.org/api/string_decoder.html
   if('string' === typeof data && !enc)
-    throw new Error('encoding is mandatory when data is string')
+    enc = 'utf8'
 
+  if(enc === 'base64' || enc === 'utf8')
+    data = toBuffer(data, enc), enc = null
+ 
   var length = lengthOf(data, enc)
   var l = this._len += length
   var s = this._s = (this._s || 0)
@@ -75,8 +80,7 @@ Hash.prototype.digest = function (enc) {
   X.setUint32(fl + 4, len, false) //big endian
 
   var hash = this._update(this._block.buffer)
-  if(!enc) return hash
-  return u.toHex(hash)
+  return u.toString(hash, enc)
 }
 
 Hash.prototype._update = function () {
