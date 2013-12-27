@@ -78,18 +78,10 @@ Sha.prototype._update = function (array) {
   for(var j = 0; j < 80; j++)
   {
     if(j < 16)
-      W.setUint32(j*4, X.getUint32((i + j)*4, BE), LE)
+      w[j] = X.getUint32((i + j)*4, BE)
     else
-      W.setUint32(
-        j*4,
-        rol(
-          W.getUint32((j -  3)*4, LE)
-        ^ W.getUint32((j -  8)*4, LE)
-        ^ W.getUint32((j - 14)*4, LE)
-        ^ W.getUint32((j - 16)*4, LE),
-        1),
-        true
-      )
+      w[j] = rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
+        
 
     var t =
       safe_add(
@@ -98,7 +90,7 @@ Sha.prototype._update = function (array) {
           sha1_ft(j, b, c, d)
         ),
         safe_add(
-          safe_add(e, W.getUint32(j*4, LE)),
+          safe_add(e, w[j]),
           sha1_kt(j)
         )
       );
