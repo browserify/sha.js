@@ -12,6 +12,13 @@ function Hash (blockSize, finalSize) {
   this._l = 0
 }
 
+function lengthOf(data, enc) {
+  if(enc == null)     return data.byteLength || data.length
+  if(enc == 'ascii')  return data.length
+  if(enc == 'hex')    return data.length/2
+  if(enc == 'base64') return data.length/3
+}
+
 Hash.prototype.update = function (data, enc) {
   //for encoding/decoding utf8, see here:
   //https://github.com/chrisdickinson/bops/blob/master/typedarray/from.js#L36-L57
@@ -19,12 +26,16 @@ Hash.prototype.update = function (data, enc) {
   var bl = this._block.byteLength
   //for now, assume ascii.
 
-  var l = this._len += data.length
+  if('string' === typeof data && !enc)
+    throw new Error('encoding is mandatory when data is string')
+
+  var length = lengthOf(data, enc)
+  var l = this._len += length
   var s = this._s = (this._s || 0)
   var f = 0
   while(s < l) {
-    var t = Math.min(data.length, f + bl)
-    u.write(this._block.buffer, data, 'ascii', s%bl, f, t, true)
+    var t = Math.min(length, f + bl)
+    u.write(this._block.buffer, data, enc, s%bl, f, t, true)
     s += (t - f)
 
     if(!(s%bl)) {
