@@ -1,99 +1,94 @@
 
 var Hash = require('../hash')
-var hexpp = require('../hexpp').defaults({bigendian: true})
-var tape = require('tape')
-var hex = '0A1B2C3D4E5F6G7H'
-
+var hexpp = require('../hexpp').defaults({bigendian: false})
 var u = require('../util')
+var tape = require('tape')
 
-function toBuffers (string, length) {
-  var a = []
-  for(var i = 0; i < string.length / length; i ++) {
-    a[i] = new Uint8Array(length)
-    u.write(a[i], string, 'ascii', 0, i*length, Math.min((i+1)*length, string.length))
-  }
+var hex = '0A1B2C3D4E5F6G7H', hexbuf
+
+var count16 = {
+      strings: ['0A1B2C3D4E5F6G7H'],
+      buffers: [
+        hexbuf = new Uint8Array([
+          48, 65, 49, 66,   50, 67, 51, 68,
+          52, 69, 53, 70,   54, 71, 55, 72
+        ]),
+        new Uint8Array([
+         128,  0,  0,  0,    0,  0,  0,  0,
+           0,  0,  0,  0,    0,  0,  0, 128
+        ])
+      ]
+    }
+var empty = {
+      strings: [''],
+      buffers: [
+        new Uint8Array([
+         128,  0,  0,  0,    0,  0,  0,  0,
+           0,  0,  0,  0,    0,  0,  0,  0
+        ])
+      ]
+    }
+var hh = 'abcdefhijklmnopq'
+
+var multi = {
+      strings: ['abcd', 'efhijk', 'lmnopq'],
+      buffers: [
+        toBuffer('abcdefhijklmnopq', 'ascii'),
+        new Uint8Array([
+         128,  0,  0,  0,    0,  0,  0,  0,
+           0,  0,  0,  0,    0,  0,  0,  128
+        ])
+      ]
+    }
+
+var long = {
+      strings: [hex+hex],
+      buffers: [
+        hexbuf,
+        hexbuf,
+        new Uint8Array([
+         128,  0,  0,  0,    0,  0,  0,  0,
+           0,  0,  0,  0,    0,  0,  1,  0
+        ])
+      ]
+    }
+
+
+function toBuffer (string, enc) {
+  var a = new Uint8Array(string.length)
+  u.write(a, string, enc, 0, 0, string.length, true)
   return a
 }
 
-tape('Hash#update 1 in 1 messages', function (t) {
+function makeTest(name, data) {
+  tape(name, function (t) {
 
-  var h = new Hash(16, 12)
-  var n = 1
-  t.plan(2)
-  h._update = function (block) {
-    console.log('---WRITTEN---')
-    console.log(hexpp(this._block))
-    t.deepEqual(block, toBuffers(hex, 16)[0].buffer)
-    if(n < 0)
-      throw new Error('expecting only 2 calls to _update')
-  }
+    var h = new Hash(16, 8)
+    var hash = new Uint8Array(20)
+    var n = 2
+    var expected = data.buffers.slice()
+    t.plan(expected.length + 1)
+    h._update = function (block) {
+      var e = expected.shift()
+      t.deepEqual(block, e.buffer)
+      if(n < 0)
+        throw new Error('expecting only 2 calls to _update')
 
-  h._final = function (block) {
-    t.equal(--n, 0)
-    console.log('final', block)
-    return new Uint8Array(20)
-  }
+      return hash
+    }
 
-  h.update(hex)
-  h.digest()
-  t.end()
+    data.strings.forEach(function (string) {
+      h.update(string)
+    })
 
-})
+    t.equal(h.digest(), hash)
+    t.end()
 
-tape('Hash#update 2 in 1 messages', function (t) {
+  })
+}
 
-  var h = new Hash(16, 12)
-  var n = 3
-  t.plan(3)
-  h._update = function (block) {
-    console.log('---WRITTEN---')
-    console.log(hexpp(this._block))
-    t.ok(--n)
-    if(n < 0)
-      throw new Error('expecting only 2 calls to _update')
-  }
-
-  h._final = function (block) {
-    t.equal(--n, 0)
-    console.log('final', block)
-    return new Uint8Array(20)
-  }
-
-  h.update(hex+hex)
-  var hash = h.digest()
-  console.log(hash)
-
-  t.end()
-})
-
-tape('Hash#update 1 in 3 messages', function (t) {
-
-  var h = new Hash(16)
-  var n = 2
-  t.plan(3)
-  var hh = hex+hex
-  var hh = 'abcdefhijklmnopq'
-  var expected = toBuffers(hh, 16)
-  console.log('expected')
-  h._update = function (block) {
-    console.log('---WRITTEN---')
-    console.log(hexpp(this._block))
-    t.deepEqual(block, expected.shift().buffer)
-    t.ok(--n)
-    if(n < 0)
-      throw new Error('expecting only 2 calls to _update')
-  }
-
-  h._final = function (block) {
-    t.equal(--n, 0)
-    console.log('final', block)
-    return new Uint8Array(20)
-  }
-
-  h.update(hh.substring(0, 4)).update(hh.substring(4, 10)).update(hh.substring(10, 16))
-  var hash = h.digest()
-  console.log(hash)
-
-  t.end()
-})
+makeTest('Hash#update 1 in 1', count16)
+makeTest('empty Hash#update', empty)
+makeTest('Hash#update 1 in 3', multi)
+makeTest('Hash#update 2 in 1', long)
 
