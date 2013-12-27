@@ -29,15 +29,11 @@ var BE = false
 var LE = true
 
 function Sha () {
-  
-  //|0 coearses to Int32
-  var h = this._h = new Uint32Array(5)
 
   this._w = new Uint32Array(80)
   Hash.call(this, 16*4, 14*4)
-
-  this._dvX = this._dv //new DataView(this._block.buffer)
-  this._dvW = new DataView(this._w.buffer)
+  
+  this._h = new Uint8Array(20)
   var H = this._dvH = new DataView(this._h.buffer)
 
   H.setUint32(A, 0x01234567, LE)
@@ -46,9 +42,7 @@ function Sha () {
   H.setUint32(D, 0x76543210, LE)
   H.setUint32(E, 0xf0e1d2c3, LE)
 
-//  this._x = this._block
   this._len = 0
-
 }
 
 
@@ -68,20 +62,17 @@ Sha.prototype._update = function (array) {
   var d = _d = H.getUint32(D, BE)
   var e = _e = H.getUint32(E, BE)
 
-  var i = 0
   var w = this._w
   var x = this._block
 
-  console.log('--- Update ---')
-  console.log(hexpp(x))
+//  console.log('--- Update ---')
+//  console.log(hexpp(x))
 
-  for(var j = 0; j < 80; j++)
-  {
-    if(j < 16)
-      w[j] = X.getUint32((i + j)*4, BE)
-    else
-      w[j] = rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
-        
+  for(var j = 0; j < 80; j++) {
+
+    w[j] = j < 16
+      ? X.getUint32(j*4, BE)
+      : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
       safe_add(
@@ -115,8 +106,7 @@ Sha.prototype._update = function (array) {
  * Perform the appropriate triplet combination function for the current
  * iteration
  */
-function sha1_ft(t, b, c, d)
-{
+function sha1_ft(t, b, c, d) {
   if(t < 20) return (b & c) | ((~b) & d);
   if(t < 40) return b ^ c ^ d;
   if(t < 60) return (b & c) | (b & d) | (c & d);
@@ -126,8 +116,7 @@ function sha1_ft(t, b, c, d)
 /*
  * Determine the appropriate additive constant for the current iteration
  */
-function sha1_kt(t)
-{
+function sha1_kt(t) {
   return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
          (t < 60) ? -1894007588 : -899497514;
 }
@@ -135,9 +124,9 @@ function sha1_kt(t)
 /*
  * Add integers, wrapping at 2^32. This uses 16-bit operations internally
  * to work around bugs in some JS interpreters.
+ * //dominictarr: this is 10 years old, so maybe this can be dropped?)
  */
-function safe_add(x, y)
-{
+function safe_add(x, y) {
   var lsw = (x & 0xFFFF) + (y & 0xFFFF);
   var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
   return (msw << 16) | (lsw & 0xFFFF);
@@ -146,8 +135,7 @@ function safe_add(x, y)
 /*
  * Bitwise rotate a 32-bit number to the left.
  */
-function rol(num, cnt)
-{
+function rol(num, cnt) {
   return (num << cnt) | (num >>> (32 - cnt));
 }
 
