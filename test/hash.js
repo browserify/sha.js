@@ -5,6 +5,11 @@ var u = require('../util')
 var tape = require('tape')
 
 var hex = '0A1B2C3D4E5F6G7H', hexbuf
+function equal(t, a,b) {
+  t.equal(a.length, b.length)
+  for(var i = 0; i < a.length; i++)
+    t.equal(a[i], b[i])
+}
 
 var count16 = {
       strings: ['0A1B2C3D4E5F6G7H'],
@@ -67,10 +72,10 @@ function makeTest(name, data) {
     var hash = new Uint8Array(20)
     var n = 2
     var expected = data.buffers.slice()
-    t.plan(expected.length + 1)
+    //t.plan(expected.length + 1)
     h._update = function (block) {
       var e = expected.shift()
-      t.deepEqual(block, e.buffer)
+      equal(t, block, e.buffer)
       if(n < 0)
         throw new Error('expecting only 2 calls to _update')
 
@@ -81,7 +86,7 @@ function makeTest(name, data) {
       h.update(string, 'ascii')
     })
 
-    t.equal(h.digest(), hash)
+    equal(t, h.digest(), hash)
     t.end()
 
   })
