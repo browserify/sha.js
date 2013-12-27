@@ -14,7 +14,7 @@
     "tape": "~2.3.2"
   },
   "scripts": {
-    "test": "set -e; for t in test/*.js; do node $t; done"
+    "test": "e=0; for t in test/*.js; do node $t; let e=$e+$?; done; exit $e"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "license": "MIT",
