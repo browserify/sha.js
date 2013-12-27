@@ -46,7 +46,7 @@ function Sha () {
   H.setUint32(D, 0x76543210, LE)
   H.setUint32(E, 0xf0e1d2c3, LE)
 
-  this._x = this._block
+//  this._x = this._block
   this._len = 0
 
 }
@@ -57,11 +57,11 @@ function Sha () {
 
 Sha.prototype._update = function (array) {
 
-  var X = this._dvX
-  var W = this._dvW
+  var X = this._dv
   var H = this._dvH
   
   var h = this._h
+
   var a = _a = H.getUint32(A, BE)
   var b = _b = H.getUint32(B, BE)
   var c = _c = H.getUint32(C, BE)
@@ -70,7 +70,7 @@ Sha.prototype._update = function (array) {
 
   var i = 0
   var w = this._w
-  var x = this._x
+  var x = this._block
 
   console.log('--- Update ---')
   console.log(hexpp(x))

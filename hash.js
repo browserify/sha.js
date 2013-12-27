@@ -63,7 +63,7 @@ Hash.prototype.digest = function (enc) {
   
   if(bits >= fl*8) {
     this._update(this._block.buffer)
-    u.zeroFill(this._x, 0)
+    u.zeroFill(this._block, 0)
   }
 
   //TODO: handle case where the bit length is > Math.pow(2, 29)
