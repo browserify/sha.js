@@ -1,7 +1,7 @@
 {
   "name": "sha.js",
   "description": "streaming sha1 hash in pure javascript",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "homepage": "https://github.com/dominictarr/sha.js",
   "repository": {
     "type": "git",
