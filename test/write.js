@@ -1,31 +1,93 @@
-
 var tape = require('tape')
 var write = require('../util').write
 var hexpp = require('../hexpp')
+var b64 = require('base64-js')
+var u = require('../util')
 
-tape('supports bigendian', function (t) {
+function toBuffer (string) {
+  var a = new Uint8Array(string.length)
+  for(var i = 0; i < string.length; i++)
+    a[i] = string.charCodeAt(i)
+  return a
+}
 
+var zero = '0'.charCodeAt(0)
+var A    = 'a'.charCodeAt(0)
+
+var HELLOTHERE = new Uint8Array([
+    104, 101, 108, 108,
+    111, 32, 116, 104,
+    101, 114, 101, 46
+  ])
+
+var FOOBARBAZ = new Uint8Array([
+    102, 111, 111,
+    98, 97, 114,
+    98, 97, 112
+  ])
+
+var FOO = toBuffer('foo')
+var BAR = toBuffer('bar')
+var BAZ = toBuffer('baz')
+
+var FOO64 = b64.fromByteArray(FOO)
+var BAR64 = b64.fromByteArray(BAR)
+var BAZ64 = b64.fromByteArray(BAZ)
+var FOOx = u.toHex('foo')
+var BARx = u.toHex('bar')
+var BAZx = u.toHex('baz')
+
+tape('hello there, ascii', function (t) {
+  var expected = HELLOTHERE
   var actual = new Uint8Array(12)
-
-  var expected = new Uint8Array([108, 108, 101, 104, 104, 116, 32, 111, 46, 101, 114, 101])
 
   write(actual, 'hello there.', 'ascii', 0, 0, 12)
 
   console.log(hexpp(actual.buffer))
   console.log(hexpp(expected.buffer))
 
-  t.deepEqual(expected, actual)
+//  t.deepEqual(expected.buffer, actual.buffer)
+  equal(t, actual.buffer, expected.buffer)
   t.end()
 })
 
-tape('several writes', function (t) {
+tape('foobarbaz, ascii', function (t) {
   var actual = new Uint8Array(9)
+  var expected = FOOBARBAZ
   write(actual, 'foo', 'ascii', 0, 0, 3)
   write(actual, 'bar', 'ascii', 3, 0, 3)
   write(actual, 'baz', 'ascii', 6, 0, 3)
-  var expected = new Uint8Array([0,0,0, 0,0,0, 0,0,0])
-  console.log(hexpp(actual.buffer, {bigendian: true}))
-//  console.log(hexpp(expected.buffer))
-  //t.deepEqual(expected, actual)
+  console.log(hexpp(actual.buffer))
+  equal(t, actual.buffer, expected.buffer)
   t.end()
 })
+
+console.log(FOO64, BAR64, BAZ64)
+
+function equal(t, a,b) {
+  t.equal(a.length, b.length)
+  for(var i = 0; i < a.length; i++)
+    t.equal(a[i], b[i])
+}
+
+tape('foobarbaz, ascii', function (t) {
+  var actual = new Uint8Array(9)
+  var expected = FOOBARBAZ
+  write(actual, FOO, null, 0, 0, 3)
+  write(actual, BAR, null, 3, 0, 3)
+  write(actual, BAZ, null, 6, 0, 3)
+  equal(t, actual.buffer, expected.buffer)
+  t.end()
+})
+
+tape('foobarbaz, hex', function (t) {
+  var actual = new Uint8Array(9)
+  var expected = FOOBARBAZ
+  write(actual, FOOx, 'hex', 0, 0, 3)
+  write(actual, BARx, 'hex', 3, 0, 3)
+  write(actual, BAZx, 'hex', 6, 0, 3)
+  equal(t, actual.buffer, expected.buffer)
+  t.end()
+})
+
+
