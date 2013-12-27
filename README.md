@@ -25,6 +25,13 @@ see code comments)
 This work is derived from Paul Johnston's ["A JavaScript implementation of the Secure Hash Algorithm"]
 (http://pajhome.org.uk/crypt/md5/sha1.html)
 
+# TODO
+
+* sha256 (and similar)
+* md5
+
+(and any other similar hashes that are close to this model)
+
 ## License
 
 MIT
