@@ -6,7 +6,7 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
-var hexpp = require('./hexpp').defaults({bigendian: true})
+var hexpp = require('./hexpp').defaults({bigendian: false})
 
 var u = require('./util')
 var reverseByteOrder = u.reverseByteOrder
@@ -34,9 +34,9 @@ function Sha () {
   var h = this._h = new Uint32Array(5)
 
   this._w = new Uint32Array(80)
-  Hash.call(this, 16*4)
+  Hash.call(this, 16*4, 14*4)
 
-  this._dvX = new DataView(this._block.buffer)
+  this._dvX = this._dv //new DataView(this._block.buffer)
   this._dvW = new DataView(this._w.buffer)
   var H = this._dvH = new DataView(this._h.buffer)
 
@@ -49,45 +49,6 @@ function Sha () {
   this._x = this._block
   this._len = 0
 
-}
-
-Sha.prototype._final = function () {
-  //do the sha stuff to the end of the message array.
-  var x = this._x, len = this._len*8
-  
-  var bits = len % 512
-  var append = bits >> 5
-  var bit = (0x80 << (24 - len % 32))
-  console.log(bit, append, bits)
-
-  console.log('--- final ---')
-  console.log(hexpp(x))
-
-  if(len === 0 || (bits && bits < 448)) {
-    x[append] |= bit;
-  }
-  else if(bits >= 448) {
-    x[append] |= bit;
-    this._update()
-    zeroFill(this._x, 0)
-  }
-  //edge case where message is multiple of 512 bits long
-  else if(bits === 0) {
-    this._update()
-    zeroFill(this._x.buffer, 0)
-    //len = this._len += 448
-    x[append] |= bit;
-  }
-
-  x[15] = len
-  console.log('--- addLed ---')
-  console.log(hexpp(x))
-  this._update()
-
-  //reorder bytes to little endian...
-  var h = this._h
-  console.log(hexpp(this._h.buffer))
-  return this
 }
 
 
@@ -117,7 +78,7 @@ Sha.prototype._update = function (array) {
   for(var j = 0; j < 80; j++)
   {
     if(j < 16)
-      W.setUint32(j*4, X.getUint32((i + j)*4, LE), LE)
+      W.setUint32(j*4, X.getUint32((i + j)*4, BE), LE)
     else
       W.setUint32(
         j*4,
@@ -154,6 +115,8 @@ Sha.prototype._update = function (array) {
   H.setUint32(C, safe_add(c, _c), BE)
   H.setUint32(D, safe_add(d, _d), BE)
   H.setUint32(E, safe_add(e, _e), BE)
+
+  return H.buffer
 }
 
 /*
