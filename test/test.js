@@ -59,7 +59,6 @@ tape('call update multiple times', function (t) {
   t.end()
 })
 
-
 tape('call update twice', function (t) {
 
   var _hash = crypto.createHash('sha1')
@@ -81,24 +80,3 @@ tape('call update twice', function (t) {
   t.end()
 })
 
-//to test what happens when updated data overlaps edge of
-//working buffer...
-//tape('append message 5 times', function (t) {
-//  var n = 1
-//  //inputs.forEach(function (v) {
-//    var v = inputs[4]
-//    console.log('HASH', v, v[0].length)
-//    var hash = new Sha1()
-//    var _hash = crypto.createHash('sha1')
-//    for(var i = 0; i < 5; i++) {
-//      hash.update(v[0], v[1])
-//      _hash.update(v[0], v[1])
-//    }
-//    var a = hash.digest('hex')
-//    var e = _hash.digest('hex')
-//    console.log(a, e)
-//    t.equal(a, e)
-//  //})
-//  t.end()
-//})
-//
