@@ -11,12 +11,12 @@ var hexpp = require('./hexpp').defaults({bigendian: false})
 var u = require('./util')
 var reverseByteOrder = u.reverseByteOrder
 var zeroFill = u.zeroFill
-module.exports = Sha
+module.exports = Sha1
 
 var inherits = require('util').inherits
 var Hash = require('./hash')
 
-inherits(Sha, Hash)
+inherits(Sha1, Hash)
 
 var q = false
 var A = 0
@@ -28,7 +28,8 @@ var E = 16
 var BE = false
 var LE = true
 
-function Sha () {
+function Sha1 () {
+  if(!(this instanceof Sha1)) return new Sha1()
 
   this._w = new Uint32Array(80)
   Hash.call(this, 16*4, 14*4)
@@ -49,7 +50,7 @@ function Sha () {
 // assume that array is a Uint32Array with length=16,
 // and that if it is the last block, it already has the length and the 1 bit appended.
 
-Sha.prototype._update = function (array) {
+Sha1.prototype._update = function (array) {
 
   var X = this._dv
   var H = this._dvH
@@ -99,7 +100,7 @@ Sha.prototype._update = function (array) {
   H.setUint32(D, safe_add(d, _d), BE)
   H.setUint32(E, safe_add(e, _e), BE)
 
-  return H.buffer
+  return h
 }
 
 /*
