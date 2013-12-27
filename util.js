@@ -20,7 +20,6 @@ exports.Uint32toHex = Uint32toHex
 //OKAY, I should have benchmarks before I worry about that.
 
 function write (buffer, string, enc, start, from, to, LE) {
-
   var l = (to - from)
   if(enc === 'ascii') {
     for( var i = 0; i < l; i++) {
@@ -41,6 +40,19 @@ function write (buffer, string, enc, start, from, to, LE) {
   else if(enc === 'base64') {
     throw new Error('base64 encoding not yet supported')
   }
+  else
+    throw new Error(enc +' encoding not yet supported')
+}
+
+function toHex (buf) {
+  buf = buf.buffer || buf
+  var l = 'string' === typeof buf ? buf.length : buf.byteLength
+  var s = ''
+  for(var i = 0; i < l; i++) {
+    var char = buf.charCodeAt ? buf.charCodeAt(i) : buf[i]
+    s += ((char>>4).toString(16)) + ((char&0xf).toString(16))
+  }
+  return s
 }
 
 
@@ -69,15 +81,6 @@ function Uint32toHex (n) {
       s = ((n >>= 4) & 0x0f).toString(16) + s
       s = ((n >>= 4) & 0x0f).toString(16) + s
       s = ((n >>= 4) & 0x0f).toString(16) + s
-  return s
-}
-
-function toHex (buf) {
-  var s = '', length = buf.byteLength || buf.length
-  for(var i = 0; i < length; i++) {
-    var char = buf.charCodeAt ? buf.charCodeAt(i) : buf[i]
-    s += (char>>4).toString(16) + ((char & 0x0f)).toString(16)
-  }
   return s
 }
 
