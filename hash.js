@@ -13,12 +13,6 @@ function Hash (blockSize, finalSize) {
 }
 
 Hash.prototype.update = function (data, enc) {
-  //convert to array of ints.
-  //since this is probably a string, copy it into the array,
-  //if it's over 16 words (and so, we have filled _i)
-  //then call _update(). if it's equal less, we have to wait,
-  //because this might be the last block, and so we have to wait for final()
-
   //for encoding/decoding utf8, see here:
   //https://github.com/chrisdickinson/bops/blob/master/typedarray/from.js#L36-L57
   //https://github.com/chrisdickinson/to-utf8
@@ -58,8 +52,8 @@ Hash.prototype.digest = function (enc) {
 
   //add end marker, so that appending 0's creats a different hash.
   x[this._len % bl] = 0x80
-  console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
-  console.log(hexpp(x))
+//  console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
+//  console.log(hexpp(x))
   
   if(bits >= fl*8) {
     this._update(this._block.buffer)
