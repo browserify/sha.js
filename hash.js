@@ -54,21 +54,21 @@ Hash.prototype.digest = function (enc) {
   var x = this._block.buffer
   var X = this._dv
 
-  var bits = len % bl*8
+  var bits = len % (bl*8)
 
   //add end marker, so that appending 0's creats a different hash.
-  x[bits >> 4] = 0x80
-
-  console.log('--- final ---')
+  x[this._len % bl] = 0x80
+  console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
   console.log(hexpp(x))
-
-  if(bits >= fl) {
+  
+  if(bits >= fl*8) {
     this._update(this._block.buffer)
-    zeroFill(this._x, 0)
+    u.zeroFill(this._x, 0)
   }
 
   //TODO: handle case where the bit length is > Math.pow(2, 29)
   X.setUint32(fl + 4, len, false) //big endian
+
   var hash = this._update(this._block.buffer)
   if(!enc) return hash
   return u.toHex(hash)
