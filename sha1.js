@@ -37,11 +37,12 @@ function Sha1 () {
   this._h = new Uint8Array(20)
   var H = this._dvH = new DataView(this._h.buffer)
   this._h32 = new Uint32Array(this._h.buffer)
-  H.setUint32(A, 0x01234567, LE)
-  H.setUint32(B, 0x89abcdef, LE)
-  H.setUint32(C, 0xfedcba98, LE)
-  H.setUint32(D, 0x76543210, LE)
-  H.setUint32(E, 0xf0e1d2c3, LE)
+
+  this._a = 0x67452301
+  this._b = 0xefcdab89
+  this._c = 0x98badcfe
+  this._d = 0x10325476
+  this._e = 0xc3d2e1f0
 
   this._len = 0
 }
@@ -57,13 +58,13 @@ Sha1.prototype._update = function (array) {
   var h32 = this._h32
 
   var h = this._h
-  var a,b,c,d,e,_a,_b,_c,_d,_e
+  var a, b, c, d, e, _a, _b, _c, _d, _e
 
-  a = _a = H.getUint32(A, BE)
-  b = _b = H.getUint32(B, BE)
-  c = _c = H.getUint32(C, BE)
-  d = _d = H.getUint32(D, BE)
-  e = _e = H.getUint32(E, BE)
+  a = _a = this._a
+  b = _b = this._b
+  c = _c = this._c
+  d = _d = this._d
+  e = _e = this._e
 
   var w = this._w
   var x = this._block
@@ -80,7 +81,7 @@ Sha1.prototype._update = function (array) {
     var t =
       add(
         add(rol(a, 5), sha1_ft(j, b, c, d)),
-        add(add(e, w[j]),sha1_kt(j))
+        add(add(e, w[j]), sha1_kt(j))
       );
 
     e = d
@@ -89,12 +90,22 @@ Sha1.prototype._update = function (array) {
     b = a
     a = t
   }
-  H.setUint32(A, add(a, _a), BE)
-  H.setUint32(B, add(b, _b), BE)
-  H.setUint32(C, add(c, _c), BE)
-  H.setUint32(D, add(d, _d), BE)
-  H.setUint32(E, add(e, _e), BE)
-  return h
+
+  this._a = add(a, _a)
+  this._b = add(b, _b)
+  this._c = add(c, _c)
+  this._d = add(d, _d)
+  this._e = add(e, _e)
+}
+
+Sha1.prototype._hash = function () {
+  var H = this._dvH //new DataView(new ArrayBuffer(20))
+  H.setUint32(A, this._a, BE)
+  H.setUint32(B, this._b, BE)
+  H.setUint32(C, this._c, BE)
+  H.setUint32(D, this._d, BE)
+  H.setUint32(E, this._e, BE)
+  return H
 }
 
 /*
@@ -120,9 +131,11 @@ function sha1_kt(t) {
  * Add integers, wrapping at 2^32. This uses 16-bit operations internally
  * to work around bugs in some JS interpreters.
  * //dominictarr: this is 10 years old, so maybe this can be dropped?)
+ *
  */
 function add(x, y) {
-  return x + y | 0
+  return (x + y ) | 0
+//lets see how this goes on testling.
 //  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
 //  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
 //  return (msw << 16) | (lsw & 0xFFFF);
