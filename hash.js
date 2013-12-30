@@ -82,7 +82,7 @@ Hash.prototype.digest = function (enc) {
   //TODO: handle case where the bit length is > Math.pow(2, 29)
   X.setUint32(fl + 4, len, false) //big endian
 
-  var hash = this._update(this._block.buffer)
+  var hash = this._update(this._block.buffer) || this._hash()
   return u.toString(new Uint8Array(hash.buffer || hash), enc)
 }
 
