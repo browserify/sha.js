@@ -53,9 +53,9 @@ function Sha1 () {
 
 Sha1.prototype._update = function (array) {
 
-  var X = this._dv
-  var H = this._dvH
-  var h32 = this._h32
+  const X = this._dv
+  const H = this._dvH
+  const h32 = this._h32
 
   var h = this._h
   var a, b, c, d, e, _a, _b, _c, _d, _e
@@ -73,15 +73,15 @@ Sha1.prototype._update = function (array) {
 //  console.log(hexpp(x))
 
   for(var j = 0; j < 80; j++) {
-
-    w[j] = j < 16
+    var W = w[j]
+      = j < 16
       ? X.getUint32(j*4, BE)
       : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
       add(
         add(rol(a, 5), sha1_ft(j, b, c, d)),
-        add(add(e, w[j]), sha1_kt(j))
+        add(add(e, W), sha1_kt(j))
       );
 
     e = d
