@@ -31,6 +31,9 @@ Hash.prototype.update = function (data, enc) {
   if('string' === typeof data && !enc)
     enc = 'utf8'
 
+  if(enc === 'utf-8')
+    enc = 'utf8'
+
   if(enc === 'base64' || enc === 'utf8')
     data = toBuffer(data, enc), enc = null
  
