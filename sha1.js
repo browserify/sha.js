@@ -6,11 +6,6 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
-var hexpp = require('./hexpp').defaults({bigendian: false})
-
-var u = require('./util')
-var reverseByteOrder = u.reverseByteOrder
-var zeroFill = u.zeroFill
 module.exports = Sha1
 
 var inherits = require('util').inherits
@@ -18,14 +13,13 @@ var Hash = require('./hash')
 
 inherits(Sha1, Hash)
 
-var q = false
 var A = 0
 var B = 4
 var C = 8
 var D = 12
 var E = 16
 
-var BE = false
+var  BE = false
 var LE = true
 
 function Sha1 () {
@@ -67,10 +61,6 @@ Sha1.prototype._update = function (array) {
   e = _e = this._e
 
   var w = this._w
-  var x = this._block
-
-//  console.log('--- Update ---')
-//  console.log(hexpp(x))
 
   for(var j = 0; j < 80; j++) {
 
