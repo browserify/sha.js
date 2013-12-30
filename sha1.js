@@ -36,7 +36,7 @@ function Sha1 () {
   
   this._h = new Uint8Array(20)
   var H = this._dvH = new DataView(this._h.buffer)
-
+  this._h32 = new Uint32Array(this._h.buffer)
   H.setUint32(A, 0x01234567, LE)
   H.setUint32(B, 0x89abcdef, LE)
   H.setUint32(C, 0xfedcba98, LE)
@@ -54,14 +54,16 @@ Sha1.prototype._update = function (array) {
 
   var X = this._dv
   var H = this._dvH
-  
-  var h = this._h
+  var h32 = this._h32
 
-  var a = _a = H.getUint32(A, BE)
-  var b = _b = H.getUint32(B, BE)
-  var c = _c = H.getUint32(C, BE)
-  var d = _d = H.getUint32(D, BE)
-  var e = _e = H.getUint32(E, BE)
+  var h = this._h
+  var a,b,c,d,e,_a,_b,_c,_d,_e
+
+  a = _a = H.getUint32(A, BE)
+  b = _b = H.getUint32(B, BE)
+  c = _c = H.getUint32(C, BE)
+  d = _d = H.getUint32(D, BE)
+  e = _e = H.getUint32(E, BE)
 
   var w = this._w
   var x = this._block
@@ -76,15 +78,9 @@ Sha1.prototype._update = function (array) {
       : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
-      safe_add(
-        safe_add(
-          rol(a, 5),
-          sha1_ft(j, b, c, d)
-        ),
-        safe_add(
-          safe_add(e, w[j]),
-          sha1_kt(j)
-        )
+      add(
+        add(rol(a, 5), sha1_ft(j, b, c, d)),
+        add(add(e, w[j]),sha1_kt(j))
       );
 
     e = d
@@ -93,13 +89,11 @@ Sha1.prototype._update = function (array) {
     b = a
     a = t
   }
-
-  H.setUint32(A, safe_add(a, _a), BE)
-  H.setUint32(B, safe_add(b, _b), BE)
-  H.setUint32(C, safe_add(c, _c), BE)
-  H.setUint32(D, safe_add(d, _d), BE)
-  H.setUint32(E, safe_add(e, _e), BE)
-
+  H.setUint32(A, add(a, _a), BE)
+  H.setUint32(B, add(b, _b), BE)
+  H.setUint32(C, add(c, _c), BE)
+  H.setUint32(D, add(d, _d), BE)
+  H.setUint32(E, add(e, _e), BE)
   return h
 }
 
@@ -127,10 +121,11 @@ function sha1_kt(t) {
  * to work around bugs in some JS interpreters.
  * //dominictarr: this is 10 years old, so maybe this can be dropped?)
  */
-function safe_add(x, y) {
-  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return (msw << 16) | (lsw & 0xFFFF);
+function add(x, y) {
+  return x + y | 0
+//  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+//  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+//  return (msw << 16) | (lsw & 0xFFFF);
 }
 
 /*
