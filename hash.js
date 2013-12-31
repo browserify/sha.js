@@ -63,7 +63,7 @@ Hash.prototype.update = function (data, enc) {
 
 Hash.prototype.digest = function (enc) {
   //how much message is leftover
-  var bl = this._block.byteLength
+  var bl = this._blockSize
   var fl = this._finalSize
   var len = this._len*8
 
