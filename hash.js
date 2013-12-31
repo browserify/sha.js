@@ -8,6 +8,7 @@ function Hash (blockSize, finalSize) {
   this._block = new Uint32Array(blockSize/4)
   this._dv = new DataView(this._block.buffer)
   this._finalSize = finalSize
+  this._blockSize = blockSize
   this._len = 0
   this._l = 0
 }
@@ -23,34 +24,36 @@ Hash.prototype.update = function (data, enc) {
   //for encoding/decoding utf8, see here:
   //https://github.com/chrisdickinson/bops/blob/master/typedarray/from.js#L36-L57
   //https://github.com/chrisdickinson/to-utf8
-  var bl = this._block.byteLength
+  var bl = this._blockSize
   //for now, assume ascii.
 
   //I'd rather do this with a streaming encoder, like the opposite of
   //http://nodejs.org/api/string_decoder.html
-  if('string' === typeof data && !enc)
-    enc = 'utf8'
+  var length
+    if(!enc && 'string' === typeof data)
+      enc = 'utf8'
 
-  if(enc === 'utf-8')
-    enc = 'utf8'
+  if(enc) {
+    if(enc === 'utf-8')
+      enc = 'utf8'
 
-  if(enc === 'base64' || enc === 'utf8')
-    data = toBuffer(data, enc), enc = null
+    if(enc === 'base64' || enc === 'utf8')
+      data = toBuffer(data, enc), enc = null
+    length = lengthOf(data, enc)
+  } else
+    length = data.byteLength || data.length
  
-  var length = lengthOf(data, enc)
   var l = this._len += length
   var s = this._s = (this._s || 0)
   var f = 0
   while(s < l) {
     var t = Math.min(length, f + bl)
     u.write(this._block.buffer, data, enc, s%bl, f, t)
-    var ch = (t - f); s += ch; f += ch
+    var ch = (t - f);
+    s += ch; f += ch
 
-    if(!(s%bl)) {
+    if(!(s%bl))
       this._update(this._block.buffer)
-      u.zeroFill(this._block.buffer, 0)
-    }
-
   }
   this._s = s
 
@@ -73,6 +76,7 @@ Hash.prototype.digest = function (enc) {
   //console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
   //console.log(hexpp(x))
   x[this._len % bl] = 0x80
+  u.zeroFill(this._block.buffer, this._len % bl + 1)
   
   if(bits >= fl*8) {
     this._update(this._block.buffer)
