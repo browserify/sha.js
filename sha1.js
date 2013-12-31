@@ -47,9 +47,8 @@ function Sha1 () {
 
 Sha1.prototype._update = function (array) {
 
-  const X = this._dv
-  const H = this._dvH
-  const h32 = this._h32
+  var X = this._dv
+  var H = this._dvH
 
   var h = this._h
   var a, b, c, d, e, _a, _b, _c, _d, _e
