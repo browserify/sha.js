@@ -7,13 +7,14 @@ var argv = process.argv.slice(2)
 if(/--help|-h/.test(argv[0])) return usage()
 
 function stream (alg, s) {
+  var start = Date.now()
   var hash = createHash(alg || 'sha1')
   s
   .on('data', function (data) {
     hash.update(data)
   })
   .on('end', function (data) {
-    console.log(hash.digest('hex'))
+    console.log(hash.digest('hex'), Date.now() - start)
   })
 }
  
