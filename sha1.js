@@ -19,7 +19,7 @@ var C = 8
 var D = 12
 var E = 16
 
-var  BE = false
+var BE = false
 var LE = true
 
 function Sha1 () {
