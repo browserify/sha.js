@@ -17,7 +17,7 @@ function Hash (blockSize, finalSize) {
 
 function lengthOf(data, enc) {
   if(enc == null)     return data.byteLength || data.length
-  if(enc == 'ascii')  return data.length
+  if(enc == 'ascii' || enc == 'binary')  return data.length
   if(enc == 'hex')    return data.length/2
   if(enc == 'base64') return data.length/3
 }
