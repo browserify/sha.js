@@ -18,7 +18,7 @@ var u        = require('./util')
 
 module.exports = Sha256
 
-var K = new Uint32Array([
+var K = [
     0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
     0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
     0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
@@ -35,7 +35,7 @@ var K = new Uint32Array([
     0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
     0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
     0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
-  ]);
+  ]
 
 inherits(Sha256, Hash)
 
@@ -44,17 +44,6 @@ function Sha256() {
     0x67e6096a, 0x85ae67bb, 0x72f36e3c, 0x3af54fa5,
     0x7f520e51, 0x8c68059b, 0xabd9831f, 0x19cde05b
   ])
-
-//  this._a = 0x67e6096a
-//  this._b = 0x85ae67bb
-//  this._c = 0x72f36e3c
-//  this._d = 0x3af54fa5
-//  this._e = 0x7f520e51
-//
-//  this._f = 0x8c68059b
-//  this._h = 0xabd9831f
-//  this._g = 0x19cde05b
-//
 
   this._a = 0x6a09e667|0
   this._b = 0xbb67ae85|0
@@ -66,7 +55,7 @@ function Sha256() {
   this._h = 0x5be0cd19|0
 
   var DV = this._dvH = new DataView(this._data.buffer)
-  this._w = new Uint32Array(64);
+  this._w = new Array(64) //new Uint32Array(64);
 
   Hash.call(this, 16*4, 14*4)
 };
@@ -109,27 +98,19 @@ var Gamma1256 = function(x) {
   return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
 };
 
+function readUint32BE (a, i) {
+  return a[i] | (a[i+1]<<8) | (a[i+2]<<16) | (a[i+3]<<24)
+}
+
 Sha256.prototype._update = function(m) {
   var l = this._len
-  var HASH = this._dvH
-  var W = this._w
-  var M = this._dv //M//new DataView(m.buffer || m);
+  var M = this._dv
   var a, b, c, d, e, f, g, h, i, j;
   var _a, _b, _c, _d, _e, _f, _g, _h
-  var T1, T2;
-
+  var T1, T2, t1, t2
+  var w = this._w
   var i = 0
 
-//  _a = a = HASH.getUint32( 0, BE);
-//  _b = b = HASH.getUint32( 4, BE);
-//  _c = c = HASH.getUint32( 8, BE);
-//  _d = d = HASH.getUint32(12, BE);
-//  _e = e = HASH.getUint32(16, BE);
-//  _f = f = HASH.getUint32(20, BE);
-//  _g = g = HASH.getUint32(24, BE);
-//  _h = h = HASH.getUint32(28, BE);
-
-//  assert.equal(this._a|0, a|0)
 
   _a = a = this._a | 0
   _b = b = this._b | 0
@@ -140,44 +121,90 @@ Sha256.prototype._update = function(m) {
   _g = g = this._g | 0
   _h = h = this._h | 0
 
-  for (var j = 0; j < 64; j++) {
-    W[j]
-      = j < 16
-      ? M.getUint32(j * 4, BE)
-      : safe_add(
-          safe_add(
-            safe_add(
-              Gamma1256(W[j - 2]),
-              W[j - 7]
-            ),
-            Gamma0256(W[j - 15])
-          ),
-          W[j - 16]
-        );
+//  for (var j = 0; j < 64; j++) {
+//    var w = W[j]
+//      = j < 16
+//      ? M.getUint32(j * 4, BE)
+//      : safe_add(
+//          safe_add(
+//            safe_add(
+//              Gamma1256(W[j - 2]),
+//              W[j - 7]
+//            ),
+//            Gamma0256(W[j - 15])
+//          ),
+//          W[j - 16]
+//        );
+//
+//    T1 = safe_add(
+//          safe_add(
+//            safe_add(
+//              safe_add(h, Sigma1256(e)),
+//              Ch(e, f, g)
+//            ),
+//            K[j]
+//          ),
+//          w
+//        );
+//
+//    T2 = safe_add(Sigma0256(a), Maj(a, b, c));
+//    h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2);
+//  }
+//
 
-    T1 = safe_add(
-          safe_add(
-            safe_add(
-              safe_add(h, Sigma1256(e)),
-              Ch(e, f, g)
-            ),
-            K[j]
-          ),
-          W[j]
-        );
+    //this bit adapted from forge's sha256, which is faster.
+    //although, their sha1 is slower.
+    //javascript performance is mysterious.
+    for(i = 0; i < 64; ++i) {
 
-    T2 = safe_add(Sigma0256(a), Maj(a, b, c));
-    h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2);
-  }
+      if(i < 16) {
+        w[i] = M.getUint32(i*4, BE)
+      } else {
 
-//  HASH.setUint32( 0, safe_add(a, _a), BE);
-//  HASH.setUint32( 4, safe_add(b, _b), BE);
-//  HASH.setUint32( 8, safe_add(c, _c), BE);
-//  HASH.setUint32(12, safe_add(d, _d), BE);
-//  HASH.setUint32(16, safe_add(e, _e), BE);
-//  HASH.setUint32(20, safe_add(f, _f), BE);
-//  HASH.setUint32(24, safe_add(g, _g), BE);
-//  HASH.setUint32(28, safe_add(h, _h), BE);
+        // XOR word 2 words ago rot right 17, rot right 19, shft right 10
+        t1 = w[i - 2];
+        t1 =
+          ((t1 >>> 17) | (t1 << 15)) ^
+          ((t1 >>> 19) | (t1 << 13)) ^
+          (t1 >>> 10);
+        // XOR word 15 words ago rot right 7, rot right 18, shft right 3
+        t2 = w[i - 15];
+        t2 =
+          ((t2 >>> 7) | (t2 << 25)) ^
+          ((t2 >>> 18) | (t2 << 14)) ^
+          (t2 >>> 3);
+        // sum(t1, word 7 ago, t2, word 16 ago) modulo 2^32
+        w[i] = (t1 + w[i - 7] + t2 + w[i - 16]) & 0xFFFFFFFF;
+      }
+
+      // round function
+      // Sum1(e)
+      s1 =
+        ((e >>> 6) | (e << 26)) ^
+        ((e >>> 11) | (e << 21)) ^
+        ((e >>> 25) | (e << 7));
+      // Ch(e, f, g) (optimized the same way as SHA-1)
+      ch = g ^ (e & (f ^ g));
+      // Sum0(a)
+      s0 =
+        ((a >>> 2) | (a << 30)) ^
+        ((a >>> 13) | (a << 19)) ^
+        ((a >>> 22) | (a << 10));
+      // Maj(a, b, c) (optimized the same way as SHA-1)
+      maj = (a & b) | (c & (a ^ b));
+
+      // main algorithm
+      t1 = h + s1 + ch + K[i] + w[i];
+      t2 = s0 + maj;
+      h = g;
+      g = f;
+      f = e;
+      e = (d + t1) & 0xFFFFFFFF;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) & 0xFFFFFFFF;
+    }
 
   this._a = safe_add(a, _a) | 0
   this._b = safe_add(b, _b) | 0
