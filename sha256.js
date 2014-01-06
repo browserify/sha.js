@@ -108,7 +108,7 @@ Sha256.prototype._update = function(m) {
   var a, b, c, d, e, f, g, h, i, j;
   var _a, _b, _c, _d, _e, _f, _g, _h
   var T1, T2, t1, t2
-  var w = this._w
+  var W = this._w
   var i = 0
 
 
@@ -121,36 +121,20 @@ Sha256.prototype._update = function(m) {
   _g = g = this._g | 0
   _h = h = this._h | 0
 
-//  for (var j = 0; j < 64; j++) {
-//    var w = W[j]
-//      = j < 16
-//      ? M.getUint32(j * 4, BE)
-//      : safe_add(
-//          safe_add(
-//            safe_add(
-//              Gamma1256(W[j - 2]),
-//              W[j - 7]
-//            ),
-//            Gamma0256(W[j - 15])
-//          ),
-//          W[j - 16]
-//        );
-//
-//    T1 = safe_add(
-//          safe_add(
-//            safe_add(
-//              safe_add(h, Sigma1256(e)),
-//              Ch(e, f, g)
-//            ),
-//            K[j]
-//          ),
-//          w
-//        );
-//
-//    T2 = safe_add(Sigma0256(a), Maj(a, b, c));
-//    h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2);
-//  }
-//
+  if(true) {
+
+    for (var j = 0; j < 64; j++) {
+      var w = W[j] = j < 16
+        ? M.getUint32(j * 4, BE)
+        : Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16]
+
+      T1 = h + Sigma1256(e) + Ch(e, f, g) + K[j] + w
+
+      T2 = Sigma0256(a) + Maj(a, b, c);
+      h = g; g = f; f = e; e = d + T1; d = c; c = b; b = a; a = T1 + T2;
+    }
+
+  } else {
 
     //this bit adapted from forge's sha256, which is faster.
     //although, their sha1 is slower.
@@ -158,23 +142,23 @@ Sha256.prototype._update = function(m) {
     for(i = 0; i < 64; ++i) {
 
       if(i < 16) {
-        w[i] = M.getUint32(i*4, BE)
+        W[i] = M.getUint32(i*4, BE)
       } else {
 
         // XOR word 2 words ago rot right 17, rot right 19, shft right 10
-        t1 = w[i - 2];
+        t1 = W[i - 2];
         t1 =
           ((t1 >>> 17) | (t1 << 15)) ^
           ((t1 >>> 19) | (t1 << 13)) ^
           (t1 >>> 10);
         // XOR word 15 words ago rot right 7, rot right 18, shft right 3
-        t2 = w[i - 15];
+        t2 = W[i - 15];
         t2 =
           ((t2 >>> 7) | (t2 << 25)) ^
           ((t2 >>> 18) | (t2 << 14)) ^
           (t2 >>> 3);
         // sum(t1, word 7 ago, t2, word 16 ago) modulo 2^32
-        w[i] = (t1 + w[i - 7] + t2 + w[i - 16]) & 0xFFFFFFFF;
+        W[i] = (t1 + W[i - 7] + t2 + W[i - 16]) & 0xFFFFFFFF;
       }
 
       // round function
@@ -194,7 +178,7 @@ Sha256.prototype._update = function(m) {
       maj = (a & b) | (c & (a ^ b));
 
       // main algorithm
-      t1 = h + s1 + ch + K[i] + w[i];
+      t1 = h + s1 + ch + K[i] + W[i];
       t2 = s0 + maj;
       h = g;
       g = f;
@@ -206,6 +190,8 @@ Sha256.prototype._update = function(m) {
       a = (t1 + t2) & 0xFFFFFFFF;
     }
 
+
+  }
   this._a = safe_add(a, _a) | 0
   this._b = safe_add(b, _b) | 0
   this._c = safe_add(c, _c) | 0
