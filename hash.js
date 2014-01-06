@@ -1,6 +1,8 @@
 var u = require('./util')
-var hexpp = require('./hexpp').defaults({bigendian: false})
+var write = u.write
+var fill = u.zeroFill
 var toBuffer = require('bops/typedarray/from')
+
 module.exports = Hash
 
 //prototype class for hash functions
@@ -46,14 +48,15 @@ Hash.prototype.update = function (data, enc) {
   var l = this._len += length
   var s = this._s = (this._s || 0)
   var f = 0
+  var buffer = this._block.buffer
   while(s < l) {
     var t = Math.min(length, f + bl)
-    u.write(this._block.buffer, data, enc, s%bl, f, t)
+    write(buffer, data, enc, s%bl, f, t)
     var ch = (t - f);
     s += ch; f += ch
 
     if(!(s%bl))
-      this._update(this._block.buffer)
+      this._update(buffer)
   }
   this._s = s
 
@@ -76,7 +79,7 @@ Hash.prototype.digest = function (enc) {
   //console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
   //console.log(hexpp(x))
   x[this._len % bl] = 0x80
-  u.zeroFill(this._block.buffer, this._len % bl + 1)
+  fill(this._block.buffer, this._len % bl + 1)
   
   if(bits >= fl*8) {
     this._update(this._block.buffer)
