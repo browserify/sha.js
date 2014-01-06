@@ -101,17 +101,17 @@ function Gamma1256 (x) {
 Sha256.prototype._update = function(m) {
   var M = this._dv
   var W = this._w
-  var a, b, c, d, e, f, g, h, _a, _b, _c, _d, _e, _f, _g, _h
+  var a, b, c, d, e, f, g, h
   var T1, T2
 
-  _a = a = this._a | 0
-  _b = b = this._b | 0
-  _c = c = this._c | 0
-  _d = d = this._d | 0
-  _e = e = this._e | 0
-  _f = f = this._f | 0
-  _g = g = this._g | 0
-  _h = h = this._h | 0
+  a = this._a | 0
+  b = this._b | 0
+  c = this._c | 0
+  d = this._d | 0
+  e = this._e | 0
+  f = this._f | 0
+  g = this._g | 0
+  h = this._h | 0
 
   for (var j = 0; j < 64; j++) {
     var w = W[j] = j < 16
@@ -124,14 +124,14 @@ Sha256.prototype._update = function(m) {
     h = g; g = f; f = e; e = d + T1; d = c; c = b; b = a; a = T1 + T2;
   }
 
-  this._a = (a + _a) | 0
-  this._b = (b + _b) | 0
-  this._c = (c + _c) | 0
-  this._d = (d + _d) | 0
-  this._e = (e + _e) | 0
-  this._f = (f + _f) | 0
-  this._g = (g + _g) | 0
-  this._h = (h + _h) | 0
+  this._a = (a + this._a) | 0
+  this._b = (b + this._b) | 0
+  this._c = (c + this._c) | 0
+  this._d = (d + this._d) | 0
+  this._e = (e + this._e) | 0
+  this._f = (f + this._f) | 0
+  this._g = (g + this._g) | 0
+  this._h = (h + this._h) | 0
 
 };
 
