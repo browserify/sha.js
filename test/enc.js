@@ -27,10 +27,13 @@ tape('base64', function (t) {
 tape('all input encodings work', function (t) {
   var hex = new Sha1().update(toString(EMPTY, 'hex'), 'hex').digest('hex')
   var base64 = new Sha1().update(toString(EMPTY, 'base64'), 'base64').digest('hex')
+  console.log('Binary:', JSON.stringify(toString(EMPTY, 'binary')))
+  var binary = new Sha1().update(toString(EMPTY, 'binary'), 'binary').digest('hex')
   var buffer = new Sha1().update(EMPTY).digest('hex')
   console.log(hex, base64, buffer)
   t.equal(hex, base64)
   t.equal(hex, buffer)
+  t.equal(hex, binary)
   t.end()
 })
 
