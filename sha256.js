@@ -10,10 +10,12 @@
 var Hash     = require('./hash')
 var inherits = require('util').inherits
 var BE       = false
-var LE       = true 
+var LE       = true
 var hexpp    = require('./hexpp')
 var to       = require('bops/typedarray/from')
 var u        = require('./util')
+//var assert   = require('assert')
+
 module.exports = Sha256
 
 var K = new Uint32Array([
@@ -38,11 +40,32 @@ var K = new Uint32Array([
 inherits(Sha256, Hash)
 
 function Sha256() {
-  this._h = new Uint32Array([
+  this._data = new Uint32Array([
     0x67e6096a, 0x85ae67bb, 0x72f36e3c, 0x3af54fa5,
     0x7f520e51, 0x8c68059b, 0xabd9831f, 0x19cde05b
   ])
-  var DV = this._dvH = new DataView(this._h.buffer)
+
+//  this._a = 0x67e6096a
+//  this._b = 0x85ae67bb
+//  this._c = 0x72f36e3c
+//  this._d = 0x3af54fa5
+//  this._e = 0x7f520e51
+//
+//  this._f = 0x8c68059b
+//  this._h = 0xabd9831f
+//  this._g = 0x19cde05b
+//
+
+  this._a = 0x6a09e667|0
+  this._b = 0xbb67ae85|0
+  this._c = 0x3c6ef372|0
+  this._d = 0xa54ff53a|0
+  this._e = 0x510e527f|0
+  this._f = 0x9b05688c|0
+  this._g = 0x1f83d9ab|0
+  this._h = 0x5be0cd19|0
+
+  var DV = this._dvH = new DataView(this._data.buffer)
   this._w = new Uint32Array(64);
 
   Hash.call(this, 16*4, 14*4)
@@ -97,14 +120,25 @@ Sha256.prototype._update = function(m) {
 
   var i = 0
 
-  _a = a = HASH.getUint32( 0, BE);
-  _b = b = HASH.getUint32( 4, BE);
-  _c = c = HASH.getUint32( 8, BE);
-  _d = d = HASH.getUint32(12, BE);
-  _e = e = HASH.getUint32(16, BE);
-  _f = f = HASH.getUint32(20, BE);
-  _g = g = HASH.getUint32(24, BE);
-  _h = h = HASH.getUint32(28, BE);
+//  _a = a = HASH.getUint32( 0, BE);
+//  _b = b = HASH.getUint32( 4, BE);
+//  _c = c = HASH.getUint32( 8, BE);
+//  _d = d = HASH.getUint32(12, BE);
+//  _e = e = HASH.getUint32(16, BE);
+//  _f = f = HASH.getUint32(20, BE);
+//  _g = g = HASH.getUint32(24, BE);
+//  _h = h = HASH.getUint32(28, BE);
+
+//  assert.equal(this._a|0, a|0)
+
+  _a = a = this._a | 0
+  _b = b = this._b | 0
+  _c = c = this._c | 0
+  _d = d = this._d | 0
+  _e = e = this._e | 0
+  _f = f = this._f | 0
+  _g = g = this._g | 0
+  _h = h = this._h | 0
 
   for (var j = 0; j < 64; j++) {
     W[j]
@@ -136,15 +170,38 @@ Sha256.prototype._update = function(m) {
     h = g; g = f; f = e; e = safe_add(d, T1); d = c; c = b; b = a; a = safe_add(T1, T2);
   }
 
-  HASH.setUint32( 0, safe_add(a, _a), BE);
-  HASH.setUint32( 4, safe_add(b, _b), BE);
-  HASH.setUint32( 8, safe_add(c, _c), BE);
-  HASH.setUint32(12, safe_add(d, _d), BE);
-  HASH.setUint32(16, safe_add(e, _e), BE);
-  HASH.setUint32(20, safe_add(f, _f), BE);
-  HASH.setUint32(24, safe_add(g, _g), BE);
-  HASH.setUint32(28, safe_add(h, _h), BE);
+//  HASH.setUint32( 0, safe_add(a, _a), BE);
+//  HASH.setUint32( 4, safe_add(b, _b), BE);
+//  HASH.setUint32( 8, safe_add(c, _c), BE);
+//  HASH.setUint32(12, safe_add(d, _d), BE);
+//  HASH.setUint32(16, safe_add(e, _e), BE);
+//  HASH.setUint32(20, safe_add(f, _f), BE);
+//  HASH.setUint32(24, safe_add(g, _g), BE);
+//  HASH.setUint32(28, safe_add(h, _h), BE);
 
-  return this._h
+  this._a = safe_add(a, _a) | 0
+  this._b = safe_add(b, _b) | 0
+  this._c = safe_add(c, _c) | 0
+  this._d = safe_add(d, _d) | 0
+  this._e = safe_add(e, _e) | 0
+  this._f = safe_add(f, _f) | 0
+  this._g = safe_add(g, _g) | 0
+  this._h = safe_add(h, _h) | 0
+
 };
 
+Sha256.prototype._hash = function () {
+
+  var H = this._dvH
+
+  H.setUint32( 0, this._a, BE);
+  H.setUint32( 4, this._b, BE);
+  H.setUint32( 8, this._c, BE);
+  H.setUint32(12, this._d, BE);
+  H.setUint32(16, this._e, BE);
+  H.setUint32(20, this._f, BE);
+  H.setUint32(24, this._g, BE);
+  H.setUint32(28, this._h, BE);
+
+  return H
+}
