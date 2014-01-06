@@ -20,7 +20,7 @@ var bopsToString = require('bops/typedarray/to')
 
 function write (buffer, string, enc, start, from, to, LE) {
   var l = (to - from)
-  if(enc === 'ascii') {
+  if(enc === 'ascii' || enc === 'binary') {
     for( var i = 0; i < l; i++) {
       buffer[start + i] = string.charCodeAt(i + from)
     }
@@ -54,6 +54,17 @@ function toHex (buf) {
   return s
 }
 
+function toBinary (buf) {
+  var s = ''
+  var l = 'string' === typeof buf ? buf.length : buf.byteLength
+  var s = ''
+  for(var i = 0; i < l; i++) {
+    var char = buf.charCodeAt ? buf.charCodeAt(i) :  buf[i]
+    s += String.fromCharCode(char)
+  }
+  return s
+}
+
 //always fill to the end!
 function zeroFill(buf, from) {
   for(var i = from; i < buf.byteLength; i++)
@@ -64,5 +75,7 @@ function toString(buf, enc) {
   if(null == enc) return buf
   if('hex' == enc)
     return toHex(buf)
+  if('binary' == enc)
+    return toBinary(buf)
   return bopsToString(buf, enc)
 }
