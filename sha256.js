@@ -113,7 +113,7 @@ Sha256.prototype._update = function(m) {
   var l = this._len
   var HASH = this._dvH
   var W = this._w
-  var M = new DataView(m.buffer || m);
+  var M = this._dv //M//new DataView(m.buffer || m);
   var a, b, c, d, e, f, g, h, i, j;
   var _a, _b, _c, _d, _e, _f, _g, _h
   var T1, T2;
