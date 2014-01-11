@@ -40,6 +40,10 @@ module.exports = function (len) {
     return e instanceof DataView && e.writeUInt32BE
   }
 
+  dv.__defineGetter__('length', function () {
+    return dv.byteLength
+  })
+
   return dv
 
 }
