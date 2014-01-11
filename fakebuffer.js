@@ -1,36 +1,39 @@
 
 //return module.exports = require('buffer').Buffer
 
+
+var BE = false
+var LE = true
+
 module.exports = function (len) {
 
   var dv = new DataView(new ArrayBuffer(len))
 
   dv.writeUInt32BE = function (value, i) {
-    return dv.setUint32(i, value, false)
+    return dv.setUint32(i, value, BE)
   }
   dv.writeUInt32LE = function (value, i) {
-    return dv.setUint32(i, value, true)
+    return dv.setUint32(i, value, LE)
   }
-
-  dv.readUInt32BE = function (value, i) {
-    return dv.getUint32(i, false)
-  }
-  dv.readUInt32LE = function (value, i) {
-    return dv.getUint32(i, true)
-  }
-
   dv.writeInt32BE = function (value, i) {
-    return dv.setInt32(i, value, false)
+    return dv.setInt32(i, value, BE)
   }
   dv.writeInt32LE = function (value, i) {
-    return dv.setInt32(i, value, true)
+    return dv.setInt32(i, value, LE)
   }
 
-  dv.readInt32BE = function (value, i) {
-    return dv.getInt32(i, false)
+  dv.readUInt32BE = function (i) {
+    return dv.getUint32(i, BE)
   }
-  dv.readInt32LE = function (value, i) {
-    return dv.getInt32(i, true)
+  dv.readUInt32LE = function (i) {
+    return dv.getUint32(i, LE)
+  }
+
+  dv.readInt32BE = function (i) {
+    return dv.getInt32(i, BE)
+  }
+  dv.readInt32LE = function (i) {
+    return dv.getInt32(i, LE)
   }
 
   dv.isBuffer = function (e) {
