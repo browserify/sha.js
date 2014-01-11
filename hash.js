@@ -1,6 +1,7 @@
 var u = require('./util')
 var write = u.write
 var fill = u.zeroFill
+var Buffer = require('./fakebuffer')
 var toBuffer = require('bops/typedarray/from')
 
 module.exports = Hash
@@ -44,7 +45,7 @@ Hash.prototype.update = function (data, enc) {
     length = lengthOf(data, enc)
   } else
     length = data.byteLength || data.length
- 
+
   var l = this._len += length
   var s = this._s = (this._s || 0)
   var f = 0
@@ -76,11 +77,9 @@ Hash.prototype.digest = function (enc) {
   var bits = len % (bl*8)
 
   //add end marker, so that appending 0's creats a different hash.
-  //console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
-  //console.log(hexpp(x))
   x[this._len % bl] = 0x80
   fill(this._block, this._len % bl + 1)
-  
+
   if(bits >= fl*8) {
     this._update(this._block)
     u.zeroFill(this._block, 0)
