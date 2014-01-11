@@ -11,13 +11,15 @@ module.exports = Sha1
 var inherits = require('util').inherits
 var Hash = require('./hash')
 
+var hexpp = require('./hexpp')
+
 inherits(Sha1, Hash)
 
-var A = 0
-var B = 4
-var C = 8
-var D = 12
-var E = 16
+var A = 0|0
+var B = 4|0
+var C = 8|0
+var D = 12|0
+var E = 16|0
 
 var BE = false
 var LE = true
@@ -28,9 +30,9 @@ function Sha1 () {
   this._w = new Uint32Array(80)
   Hash.call(this, 16*4, 14*4)
   
-  this._h = new Uint8Array(20)
-  var H = this._dvH = new DataView(this._h.buffer)
-  this._h32 = new Uint32Array(this._h.buffer)
+  this._h = new Buffer(20) //new Uint8Array(20)
+  var H = this._dvH = this._h // = new DataView(this._h.buffer)
+//  this._h32 = new Uint32Array(this._h.buffer)
 
   this._a = 0x67452301
   this._b = 0xefcdab89
@@ -47,8 +49,10 @@ function Sha1 () {
 
 Sha1.prototype._update = function (array) {
 
-  var X = this._dv
-  var H = this._dvH
+  var X = this._block
+//  var H = this._dvH
+
+//  console.log(hexpp(X))
 
   var h = this._h
   var a, b, c, d, e, _a, _b, _c, _d, _e
@@ -64,7 +68,7 @@ Sha1.prototype._update = function (array) {
   for(var j = 0; j < 80; j++) {
     var W = w[j]
       = j < 16
-      ? X.getUint32(j*4, BE)
+      ? X.readInt32BE(j*4)
       : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
@@ -89,11 +93,13 @@ Sha1.prototype._update = function (array) {
 
 Sha1.prototype._hash = function () {
   var H = this._dvH //new DataView(new ArrayBuffer(20))
-  H.setUint32(A, this._a, BE)
-  H.setUint32(B, this._b, BE)
-  H.setUint32(C, this._c, BE)
-  H.setUint32(D, this._d, BE)
-  H.setUint32(E, this._e, BE)
+
+  //console.log(this._a|0, this._b|0, this._c|0, this._d|0, this._e|0)
+  H.writeInt32BE(this._a|0, A)
+  H.writeInt32BE(this._b|0, B)
+  H.writeInt32BE(this._c|0, C)
+  H.writeInt32BE(this._d|0, D)
+  H.writeInt32BE(this._e|0, E)
   return H
 }
 

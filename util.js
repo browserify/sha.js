@@ -67,11 +67,13 @@ function toBinary (buf) {
 
 //always fill to the end!
 function zeroFill(buf, from) {
-  for(var i = from; i < buf.byteLength; i++)
+  for(var i = from; i < buf.length; i++)
     buf[i] = 0
 }
 
 function toString(buf, enc) {
+  if(Buffer.isBuffer(buf))
+    return buf.toString(enc)
   if(null == enc) return buf
   if('hex' == enc)
     return toHex(buf)

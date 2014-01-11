@@ -7,8 +7,8 @@ module.exports = Hash
 
 //prototype class for hash functions
 function Hash (blockSize, finalSize) {
-  this._block = new Uint32Array(blockSize/4)
-  this._dv = new DataView(this._block.buffer)
+  this._block = new Buffer(blockSize) //new Uint32Array(blockSize/4)
+//  this._dv = new DataView(this._block.buffer)
   this._finalSize = finalSize
   this._blockSize = blockSize
   this._len = 0
@@ -48,7 +48,7 @@ Hash.prototype.update = function (data, enc) {
   var l = this._len += length
   var s = this._s = (this._s || 0)
   var f = 0
-  var buffer = this._block.buffer
+  var buffer = this._block.buffer || this._block
   while(s < l) {
     var t = Math.min(length, f + bl)
     write(buffer, data, enc, s%bl, f, t)
@@ -70,8 +70,8 @@ Hash.prototype.digest = function (enc) {
   var fl = this._finalSize
   var len = this._len*8
 
-  var x = this._block.buffer
-  var X = this._dv
+  var x = this._block
+//  var X = this._dv
 
   var bits = len % (bl*8)
 
@@ -79,18 +79,18 @@ Hash.prototype.digest = function (enc) {
   //console.log('--- final ---', bits, fl, this._len % bl, fl + 4, fl*8, bits >= fl*8)
   //console.log(hexpp(x))
   x[this._len % bl] = 0x80
-  fill(this._block.buffer, this._len % bl + 1)
+  fill(this._block, this._len % bl + 1)
   
   if(bits >= fl*8) {
-    this._update(this._block.buffer)
+    this._update(this._block)
     u.zeroFill(this._block, 0)
   }
 
   //TODO: handle case where the bit length is > Math.pow(2, 29)
-  X.setUint32(fl + 4, len, false) //big endian
+  x.writeInt32BE(len, fl + 4) //big endian
 
-  var hash = this._update(this._block.buffer) || this._hash()
-  return u.toString(new Uint8Array(hash.buffer || hash), enc)
+  var hash = this._update(this._block) || this._hash()
+  return u.toString(hash, enc)
 }
 
 Hash.prototype._update = function () {
