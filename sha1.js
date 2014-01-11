@@ -12,7 +12,7 @@ var inherits = require('util').inherits
 var Hash = require('./hash')
 
 var hexpp = require('./hexpp')
-
+var Buffer = require('./fakebuffer')
 inherits(Sha1, Hash)
 
 var A = 0|0
