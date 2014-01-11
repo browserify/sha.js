@@ -25,7 +25,7 @@ var LE = true
 function Sha1 () {
   if(!(this instanceof Sha1)) return new Sha1()
 
-  this._w = new Uint32Array(80)
+  this._w = new Int32Array(80)
   Hash.call(this, 16*4, 14*4)
   
   this._h = new Uint8Array(20)
@@ -64,7 +64,7 @@ Sha1.prototype._update = function (array) {
   for(var j = 0; j < 80; j++) {
     var W = w[j]
       = j < 16
-      ? X.getUint32(j*4, BE)
+      ? X.getInt32(j*4, BE)
       : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
@@ -89,11 +89,11 @@ Sha1.prototype._update = function (array) {
 
 Sha1.prototype._hash = function () {
   var H = this._dvH //new DataView(new ArrayBuffer(20))
-  H.setUint32(A, this._a, BE)
-  H.setUint32(B, this._b, BE)
-  H.setUint32(C, this._c, BE)
-  H.setUint32(D, this._d, BE)
-  H.setUint32(E, this._e, BE)
+  H.setInt32(A, this._a, BE)
+  H.setInt32(B, this._b, BE)
+  H.setInt32(C, this._c, BE)
+  H.setInt32(D, this._d, BE)
+  H.setInt32(E, this._e, BE)
   return H
 }
 
