@@ -27,7 +27,7 @@ var LE = true
 function Sha1 () {
   if(!(this instanceof Sha1)) return new Sha1()
 
-  this._w = new Uint32Array(80)
+  this._w = new Int32Array(80)
   Hash.call(this, 16*4, 14*4)
   
   this._h = new Buffer(20) //new Uint8Array(20)
@@ -68,7 +68,7 @@ Sha1.prototype._update = function (array) {
   for(var j = 0; j < 80; j++) {
     var W = w[j]
       = j < 16
-      ? X.readInt32BE(j*4)
+      ? /*X.getInt32(j*4, false)*/ X.readInt32BE(j*4)
       : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
     var t =
