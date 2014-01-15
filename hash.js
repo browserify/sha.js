@@ -82,7 +82,7 @@ module.exports = function (Buffer) {
 
     var hash = this._update(this._block) || this._hash()
     if(enc == null) return hash
-    return u.toString(hash, enc)
+    return hash.toString(enc)
   }
 
   Hash.prototype._update = function () {

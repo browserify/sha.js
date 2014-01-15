@@ -8,7 +8,7 @@
     "url": "git://github.com/dominictarr/sha.js.git"
   },
   "dependencies": {
-    "bops": "~0.1.1"
+    "native-buffer-browserify": "~2.0.8"
   },
   "devDependencies": {
     "tape": "~2.3.2"
