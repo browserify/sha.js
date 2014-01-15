@@ -6,134 +6,145 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
-module.exports = Sha1
+module.exports = function (Buffer, Hash) {
 
-var inherits = require('util').inherits
-var Hash = require('./hash')
+  var inherits = require('util').inherits
 
-inherits(Sha1, Hash)
+  var hexpp = require('./hexpp')
 
-var A = 0
-var B = 4
-var C = 8
-var D = 12
-var E = 16
+  inherits(Sha1, Hash)
 
-var BE = false
-var LE = true
+  var A = 0|0
+  var B = 4|0
+  var C = 8|0
+  var D = 12|0
+  var E = 16|0
 
-function Sha1 () {
-  if(!(this instanceof Sha1)) return new Sha1()
+  var BE = false
+  var LE = true
 
-  this._w = new Int32Array(80)
-  Hash.call(this, 16*4, 14*4)
+  function Sha1 () {
+    if(!(this instanceof Sha1)) return new Sha1()
+
+    this._w = new Int32Array(80)
+    Hash.call(this, 16*4, 14*4)
   
-  this._h = new Uint8Array(20)
-  var H = this._dvH = new DataView(this._h.buffer)
-  this._h32 = new Uint32Array(this._h.buffer)
+    this._h = new Buffer(20)
 
-  this._a = 0x67452301
-  this._b = 0xefcdab89
-  this._c = 0x98badcfe
-  this._d = 0x10325476
-  this._e = 0xc3d2e1f0
+    this._a = 0x67452301
+    this._b = 0xefcdab89
+    this._c = 0x98badcfe
+    this._d = 0x10325476
+    this._e = 0xc3d2e1f0
 
-  this._len = 0
-}
-
-
-// assume that array is a Uint32Array with length=16,
-// and that if it is the last block, it already has the length and the 1 bit appended.
-
-Sha1.prototype._update = function (array) {
-
-  var X = this._dv
-  var H = this._dvH
-
-  var h = this._h
-  var a, b, c, d, e, _a, _b, _c, _d, _e
-
-  a = _a = this._a
-  b = _b = this._b
-  c = _c = this._c
-  d = _d = this._d
-  e = _e = this._e
-
-  var w = this._w
-
-  for(var j = 0; j < 80; j++) {
-    var W = w[j]
-      = j < 16
-      ? X.getInt32(j*4, BE)
-      : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
-
-    var t =
-      add(
-        add(rol(a, 5), sha1_ft(j, b, c, d)),
-        add(add(e, W), sha1_kt(j))
-      );
-
-    e = d
-    d = c
-    c = rol(b, 30)
-    b = a
-    a = t
+    this._len = 0
   }
 
-  this._a = add(a, _a)
-  this._b = add(b, _b)
-  this._c = add(c, _c)
-  this._d = add(d, _d)
-  this._e = add(e, _e)
-}
 
-Sha1.prototype._hash = function () {
-  var H = this._dvH //new DataView(new ArrayBuffer(20))
-  H.setInt32(A, this._a, BE)
-  H.setInt32(B, this._b, BE)
-  H.setInt32(C, this._c, BE)
-  H.setInt32(D, this._d, BE)
-  H.setInt32(E, this._e, BE)
-  return H
-}
+  // assume that array is a Uint32Array with length=16,
+  // and that if it is the last block, it already has the length and the 1 bit appended.
 
-/*
- * Perform the appropriate triplet combination function for the current
- * iteration
- */
-function sha1_ft(t, b, c, d) {
-  if(t < 20) return (b & c) | ((~b) & d);
-  if(t < 40) return b ^ c ^ d;
-  if(t < 60) return (b & c) | (b & d) | (c & d);
-  return b ^ c ^ d;
-}
 
-/*
- * Determine the appropriate additive constant for the current iteration
- */
-function sha1_kt(t) {
-  return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
-         (t < 60) ? -1894007588 : -899497514;
-}
+  var isDV = new Buffer(1) instanceof DataView
+  function readInt32BE (X, i) {
+    return isDV
+      ? X.getInt32(i, false)
+      : X.readInt32BE(i)
+  }
 
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- * //dominictarr: this is 10 years old, so maybe this can be dropped?)
- *
- */
-function add(x, y) {
-  return (x + y ) | 0
-//lets see how this goes on testling.
-//  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-//  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-//  return (msw << 16) | (lsw & 0xFFFF);
-}
+  Sha1.prototype._update = function (array) {
 
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-function rol(num, cnt) {
-  return (num << cnt) | (num >>> (32 - cnt));
-}
+    var X = this._block
+    var h = this._h
+    var a, b, c, d, e, _a, _b, _c, _d, _e
 
+    a = _a = this._a
+    b = _b = this._b
+    c = _c = this._c
+    d = _d = this._d
+    e = _e = this._e
+
+    var w = this._w
+
+    for(var j = 0; j < 80; j++) {
+      var W = w[j]
+        = j < 16
+        //? X.getInt32(j*4, false)
+        //? readInt32BE(X, j*4) //*/ X.readInt32BE(j*4) //*/
+        ? X.readInt32BE(j*4)
+        : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
+
+      var t =
+        add(
+          add(rol(a, 5), sha1_ft(j, b, c, d)),
+          add(add(e, W), sha1_kt(j))
+        );
+
+      e = d
+      d = c
+      c = rol(b, 30)
+      b = a
+      a = t
+    }
+
+    this._a = add(a, _a)
+    this._b = add(b, _b)
+    this._c = add(c, _c)
+    this._d = add(d, _d)
+    this._e = add(e, _e)
+  }
+
+  Sha1.prototype._hash = function () {
+    var H = this._h
+
+    //console.log(this._a|0, this._b|0, this._c|0, this._d|0, this._e|0)
+    H.writeInt32BE(this._a|0, A)
+    H.writeInt32BE(this._b|0, B)
+    H.writeInt32BE(this._c|0, C)
+    H.writeInt32BE(this._d|0, D)
+    H.writeInt32BE(this._e|0, E)
+    return H
+  }
+
+  /*
+   * Perform the appropriate triplet combination function for the current
+   * iteration
+   */
+  function sha1_ft(t, b, c, d) {
+    if(t < 20) return (b & c) | ((~b) & d);
+    if(t < 40) return b ^ c ^ d;
+    if(t < 60) return (b & c) | (b & d) | (c & d);
+    return b ^ c ^ d;
+  }
+
+  /*
+   * Determine the appropriate additive constant for the current iteration
+   */
+  function sha1_kt(t) {
+    return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
+           (t < 60) ? -1894007588 : -899497514;
+  }
+
+  /*
+   * Add integers, wrapping at 2^32. This uses 16-bit operations internally
+   * to work around bugs in some JS interpreters.
+   * //dominictarr: this is 10 years old, so maybe this can be dropped?)
+   *
+   */
+  function add(x, y) {
+    return (x + y ) | 0
+  //lets see how this goes on testling.
+  //  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+  //  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+  //  return (msw << 16) | (lsw & 0xFFFF);
+  }
+
+  /*
+   * Bitwise rotate a 32-bit number to the left.
+   */
+  function rol(num, cnt) {
+    return (num << cnt) | (num >>> (32 - cnt));
+  }
+
+  return Sha1
+}

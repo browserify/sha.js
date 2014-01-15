@@ -4,19 +4,6 @@ exports.zeroFill = zeroFill
 
 exports.toString = toString
 var bopsToString = require('bops/typedarray/to')
-//change me: args should be:
-//buffer, string, enc, string_start, buffer_start
-//write will write as much of string into buffer as possible, and return the new length.
-//no. that is not enough... because of utf8.
-//HMM
-
-//I think this is just too coupled to be separate.
-//for utf8 you also need the state of the character...
-
-//the simplest way would be to just convert the utf8 to a buffer first.
-//not optimal, though...
-
-//OKAY, I should have benchmarks before I worry about that.
 
 function write (buffer, string, enc, start, from, to, LE) {
   var l = (to - from)
@@ -67,11 +54,13 @@ function toBinary (buf) {
 
 //always fill to the end!
 function zeroFill(buf, from) {
-  for(var i = from; i < buf.byteLength; i++)
+  for(var i = from; i < buf.length; i++)
     buf[i] = 0
 }
 
 function toString(buf, enc) {
+  if(Buffer.isBuffer(buf))
+    return buf.toString(enc)
   if(null == enc) return buf
   if('hex' == enc)
     return toHex(buf)

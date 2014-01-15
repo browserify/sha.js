@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-var createHash = require('./')
+var createHash = require('./browserify')
 
 var argv = process.argv.slice(2)
 
@@ -14,7 +14,9 @@ function stream (alg, s) {
     hash.update(data)
   })
   .on('end', function (data) {
-    console.log(hash.digest('hex'), Date.now() - start)
+    if(process.env.DEBUG)
+      return console.log(hash.digest('hex'), Date.now() - start)
+    console.log(hash.digest('hex'))
   })
 }
  
@@ -24,12 +26,6 @@ if(!process.stdin.isTTY) {
   var filename = argv.pop()
   var alg = argv.pop()
   stream(alg, require('fs').createReadStream(filename))
-
-//  require('fs')
-//    .readFile(filename, function (e, data) {
-//      console.log(createHash(alg).update(data).digest('hex'))
-//    })
-//
 } else {
   usage()
 }
