@@ -2,7 +2,6 @@ var tape = require('tape')
 var write = require('../util').write
 var hexpp = require('../hexpp')
 var u = require('../util')
-var to = require('bops/typedarray/to')
 
 function toBuffer (string) {
   var a = new Uint8Array(string.length)
@@ -30,12 +29,13 @@ var FOO = toBuffer('foo')
 var BAR = toBuffer('bar')
 var BAZ = toBuffer('baz')
 
-var FOO64 = to(FOO, 'base64')
-var BAR64 = to(BAR, 'base64')
-var BAZ64 = to(BAZ, 'base64')
-var FOOx = u.toHex('foo')
-var BARx = u.toHex('bar')
-var BAZx = u.toHex('baz')
+var FOO64 = FOO.toString('base64')
+var BAR64 = BAR.toString('base64')
+var BAZ64 = BAZ.toString('base64')
+
+var FOOx = FOO.toString('hex')
+var BARx = BAR.toString('hex')
+var BAZx = BAZ.toString('hex')
 
 tape('hello there, ascii', function (t) {
   var expected = HELLOTHERE

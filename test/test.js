@@ -87,8 +87,8 @@ tape('hex encoding', function (t) {
     var _hash = crypto.createHash('sha1')
     for(var i = 0; i < v[0].length; i=(i+1)*2) {
       var s = v[0].substring(i, (i+1)*2)
-      hash.update(u.toHex(s), 'hex')
-      _hash.update(u.toHex(s), 'hex')
+      hash.update(new Buffer(s, 'ascii').toString('hex'), 'hex')
+      _hash.update(new Buffer(s, 'ascii').toString('hex'), 'hex')
     }
     var a = hash.digest('hex')
     var e = _hash.digest('hex')
