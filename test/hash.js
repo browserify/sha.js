@@ -1,11 +1,11 @@
-
-var Hash = require('../hash')
 var hexpp = require('../hexpp').defaults({bigendian: false})
 var u = require('../util')
 var tape = require('tape')
+var Buffer = require('native-buffer-browserify').Buffer
+var Hash = require('../hash')(Buffer)
 
 var hex = '0A1B2C3D4E5F6G7H', hexbuf
-function equal(t, a,b) {
+function equal(t, a, b) {
   t.equal(a.length, b.length)
   for(var i = 0; i < a.length; i++)
     t.equal(a[i], b[i])
@@ -14,11 +14,11 @@ function equal(t, a,b) {
 var count16 = {
       strings: ['0A1B2C3D4E5F6G7H'],
       buffers: [
-        hexbuf = new Uint8Array([
+        hexbuf = new Buffer([
           48, 65, 49, 66,   50, 67, 51, 68,
           52, 69, 53, 70,   54, 71, 55, 72
         ]),
-        new Uint8Array([
+        new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  0, 128
         ])
@@ -27,7 +27,7 @@ var count16 = {
 var empty = {
       strings: [''],
       buffers: [
-        new Uint8Array([
+        new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  0,  0
         ])
@@ -39,7 +39,7 @@ var multi = {
       strings: ['abcd', 'efhijk', 'lmnopq'],
       buffers: [
         toBuffer('abcdefhijklmnopq', 'ascii'),
-        new Uint8Array([
+        new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  0,  128
         ])
@@ -51,7 +51,7 @@ var long = {
       buffers: [
         hexbuf,
         hexbuf,
-        new Uint8Array([
+        new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  1,  0
         ])
@@ -60,7 +60,7 @@ var long = {
 
 
 function toBuffer (string, enc) {
-  var a = new Uint8Array(string.length)
+  var a = new Buffer(string.length)
   u.write(a, string, enc, 0, 0, string.length, true)
   return a
 }
@@ -69,13 +69,18 @@ function makeTest(name, data) {
   tape(name, function (t) {
 
     var h = new Hash(16, 8)
-    var hash = new Uint8Array(20)
+    var hash = new Buffer(20)
     var n = 2
     var expected = data.buffers.slice()
     //t.plan(expected.length + 1)
     h._update = function (block) {
       var e = expected.shift()
-      equal(t, block, e.buffer)
+      console.error('---block---')
+      console.error(hexpp(block), block.length)
+      console.error('---e---')
+      console.error(hexpp(e), block.length)
+      console.log(block)
+      equal(t, block, e)
       if(n < 0)
         throw new Error('expecting only 2 calls to _update')
 
