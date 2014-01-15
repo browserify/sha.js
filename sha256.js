@@ -40,11 +40,6 @@ module.exports = function (Buffer, Hash) {
   function Sha256() {
     this._data = new Buffer(32)
 
-  //new Uint32Array([
-  //    0x67e6096a, 0x85ae67bb, 0x72f36e3c, 0x3af54fa5,
-  //    0x7f520e51, 0x8c68059b, 0xabd9831f, 0x19cde05b
-  //  ])
-
     this._a = 0x6a09e667|0
     this._b = 0xbb67ae85|0
     this._c = 0x3c6ef372|0
@@ -54,9 +49,7 @@ module.exports = function (Buffer, Hash) {
     this._g = 0x1f83d9ab|0
     this._h = 0x5be0cd19|0
 
-    //var DV = this._dvH = new DataView(this._data.buffer)
-  
-    this._w = new Array(64) //new Uint32Array(64);
+    this._w = new Array(64)
 
     Hash.call(this, 16*4, 14*4)
   };
@@ -116,7 +109,6 @@ module.exports = function (Buffer, Hash) {
 
     for (var j = 0; j < 64; j++) {
       var w = W[j] = j < 16
-        //? M.getUint32(j * 4, BE)
         ? M.readInt32BE(j * 4)
         : Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16]
 
@@ -141,15 +133,6 @@ module.exports = function (Buffer, Hash) {
 
     var H = this._data
 
-  //  H.setUint32( 0, this._a, BE);
-  //  H.setUint32( 4, this._b, BE);
-  //  H.setUint32( 8, this._c, BE);
-  //  H.setUint32(12, this._d, BE);
-  //  H.setUint32(16, this._e, BE);
-  //  H.setUint32(20, this._f, BE);
-  //  H.setUint32(24, this._g, BE);
-  //  H.setUint32(28, this._h, BE);
-  //
     H.writeInt32BE(this._a,  0)
     H.writeInt32BE(this._b,  4)
     H.writeInt32BE(this._c,  8)

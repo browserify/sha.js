@@ -22,7 +22,6 @@ module.exports = function (Buffer) {
 
   Hash.prototype.update = function (data, enc) {
     var bl = this._blockSize
-    //for now, assume ascii.
 
     //I'd rather do this with a streaming encoder, like the opposite of
     //http://nodejs.org/api/string_decoder.html
@@ -61,7 +60,6 @@ module.exports = function (Buffer) {
   }
 
   Hash.prototype.digest = function (enc) {
-    //how much message is leftover
     var bl = this._blockSize
     var fl = this._finalSize
     var len = this._len*8
@@ -92,5 +90,4 @@ module.exports = function (Buffer) {
   }
 
   return Hash
-
 }

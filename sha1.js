@@ -29,9 +29,7 @@ module.exports = function (Buffer, Hash) {
     this._w = new Int32Array(80)
     Hash.call(this, 16*4, 14*4)
   
-    this._h = new Buffer(20) //new Uint8Array(20)
-    var H = this._dvH = this._h // = new DataView(this._h.buffer)
-  //  this._h32 = new Uint32Array(this._h.buffer)
+    this._h = new Buffer(20)
 
     this._a = 0x67452301
     this._b = 0xefcdab89
@@ -57,10 +55,6 @@ module.exports = function (Buffer, Hash) {
   Sha1.prototype._update = function (array) {
 
     var X = this._block
-  //  var H = this._dvH
-
-  //  console.log(hexpp(X))
-
     var h = this._h
     var a, b, c, d, e, _a, _b, _c, _d, _e
 
@@ -101,7 +95,7 @@ module.exports = function (Buffer, Hash) {
   }
 
   Sha1.prototype._hash = function () {
-    var H = this._dvH //new DataView(new ArrayBuffer(20))
+    var H = this._h
 
     //console.log(this._a|0, this._b|0, this._c|0, this._d|0, this._e|0)
     H.writeInt32BE(this._a|0, A)
