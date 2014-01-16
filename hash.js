@@ -10,7 +10,12 @@ module.exports = function (Buffer) {
     this._finalSize = finalSize
     this._blockSize = blockSize
     this._len = 0
-    this._l = 0
+    this._s = 0
+  }
+
+  Hash.prototype.init = function () {
+    this._s = 0
+    this._len = 0
   }
 
   function lengthOf(data, enc) {

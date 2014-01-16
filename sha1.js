@@ -10,8 +10,6 @@ module.exports = function (Buffer, Hash) {
 
   var inherits = require('util').inherits
 
-  var hexpp = require('./hexpp')
-
   inherits(Sha1, Hash)
 
   var A = 0|0
@@ -23,23 +21,34 @@ module.exports = function (Buffer, Hash) {
   var BE = false
   var LE = true
 
-  function Sha1 () {
-    if(!(this instanceof Sha1)) return new Sha1()
+  var W = new Int32Array(80)
 
-    this._w = new Int32Array(80)
+  var POOL = []
+
+  function Sha1 () {
+    if(POOL.length)
+      return POOL.pop().init()
+
+    if(!(this instanceof Sha1)) return new Sha1()
+    this._w = W
     Hash.call(this, 16*4, 14*4)
   
-    this._h = new Buffer(20)
+    this._h = null
+    this.init()
+  }
 
+  Sha1.prototype.init = function () {
     this._a = 0x67452301
     this._b = 0xefcdab89
     this._c = 0x98badcfe
     this._d = 0x10325476
     this._e = 0xc3d2e1f0
 
-    this._len = 0
+    Hash.prototype.init.call(this)
+    return this
   }
 
+  Sha1.prototype._POOL = POOL
 
   // assume that array is a Uint32Array with length=16,
   // and that if it is the last block, it already has the length and the 1 bit appended.
@@ -95,8 +104,8 @@ module.exports = function (Buffer, Hash) {
   }
 
   Sha1.prototype._hash = function () {
-    var H = this._h
-
+    if(POOL.length < 100) POOL.push(this)
+    var H = new Buffer(20)
     //console.log(this._a|0, this._b|0, this._c|0, this._d|0, this._e|0)
     H.writeInt32BE(this._a|0, A)
     H.writeInt32BE(this._b|0, B)

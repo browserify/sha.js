@@ -35,9 +35,22 @@ module.exports = function (Buffer, Hash) {
     ]
 
   inherits(Sha256, Hash)
-
+  var W = new Array(64)
+  var POOL = []
   function Sha256() {
-    this._data = new Buffer(32)
+    if(POOL.length) {
+      //return POOL.shift().init()
+    }
+    //this._data = new Buffer(32)
+
+    this.init()
+
+    this._w = W //new Array(64)
+
+    Hash.call(this, 16*4, 14*4)
+  };
+
+  Sha256.prototype.init = function () {
 
     this._a = 0x6a09e667|0
     this._b = 0xbb67ae85|0
@@ -48,10 +61,10 @@ module.exports = function (Buffer, Hash) {
     this._g = 0x1f83d9ab|0
     this._h = 0x5be0cd19|0
 
-    this._w = new Array(64)
+    this._len = this._s = 0
 
-    Hash.call(this, 16*4, 14*4)
-  };
+    return this
+  }
 
   var safe_add = function(x, y) {
     var lsw = (x & 0xFFFF) + (y & 0xFFFF);
@@ -129,8 +142,10 @@ module.exports = function (Buffer, Hash) {
   };
 
   Sha256.prototype._hash = function () {
+    if(POOL.length < 10)
+      POOL.push(this)
 
-    var H = this._data
+    var H = new Buffer(32)
 
     H.writeInt32BE(this._a,  0)
     H.writeInt32BE(this._b,  4)
