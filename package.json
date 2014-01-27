@@ -20,7 +20,7 @@
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "license": "MIT",
   "testling": {
-    "files": "test/*.js",
+    "files": "test/{vectors,write,hash}.js",
     "browsers": [
       "ie/8..latest",
       "firefox/17..latest",
