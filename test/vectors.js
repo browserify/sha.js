@@ -20,7 +20,10 @@ function makeTest(alg, i, verbose) {
     }
     var buf = new Buffer(v.input, 'base64')
     t.equal(createHash(alg).update(buf).digest('hex'), v[alg])
-    t.end()
+    setTimeout(function () {
+      //avoid "too much recursion" errors in tape in firefox
+      t.end()
+    })
   })
   
 }
