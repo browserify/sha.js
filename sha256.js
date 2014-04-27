@@ -10,7 +10,6 @@
 var inherits = require('util').inherits
 var BE       = false
 var LE       = true
-var hexpp    = require('./hexpp')
 var u        = require('./util')
 
 module.exports = function (Buffer, Hash) {
