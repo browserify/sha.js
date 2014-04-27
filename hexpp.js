@@ -36,9 +36,3 @@ hexpp.defaults = function (opts) {
   }
 }
 
-if(!module.parent) {
-  var b = new Buffer (64)
-  console.log(hexpp(b))
-  console.log(hexpp(b, {bigendian: true}))
-}
-
