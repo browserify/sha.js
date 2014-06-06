@@ -4,7 +4,7 @@ var exports = module.exports = function (alg) {
   return new Alg()
 }
 
-var Buffer = require('native-buffer-browserify').Buffer
+var Buffer = require('buffer/').Buffer
 var Hash   = require('./hash')(Buffer)
 
 exports.sha =
