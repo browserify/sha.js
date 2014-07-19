@@ -1,5 +1,5 @@
 var exports = module.exports = function (alg) {
-  var Alg = exports[alg]
+  var Alg = exports[alg.toLowerCase()]
   if(!Alg) throw new Error(alg + ' is not supported (we accept pull requests)')
   return new Alg()
 }
