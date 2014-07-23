@@ -50,7 +50,7 @@ module.exports = function (Buffer) {
     var f = 0
     var buffer = this._block
     while(s < l) {
-      var t = Math.min(length, f + bl)
+      var t = Math.min(length, f + bl - s%bl)
       write(buffer, data, enc, s%bl, f, t)
       var ch = (t - f);
       s += ch; f += ch
