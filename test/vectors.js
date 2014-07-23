@@ -9,7 +9,7 @@ var createHash = require('../')
 
 function makeTest(alg, i, verbose) {
   var v = vectors[i]
-  
+
   tape(alg + ': NIST vector ' + i, function (t) {
     if(verbose) {
       console.log(v)
@@ -20,6 +20,22 @@ function makeTest(alg, i, verbose) {
     }
     var buf = new Buffer(v.input, 'base64')
     t.equal(createHash(alg).update(buf).digest('hex'), v[alg])
+
+    var i = ~~(buf.length / 2)
+    var buf1 = buf.slice(0, i)
+    var buf2 = buf.slice(i, buf.length)
+
+    console.log(buf1.length, buf2.length, buf.length)
+    console.log(createHash(alg)._block.length)
+
+    t.equal(
+      createHash(alg)
+        .update(buf1)
+        .update(buf2)
+        .digest('hex'),
+      v[alg]
+    )
+
     setTimeout(function () {
       //avoid "too much recursion" errors in tape in firefox
       t.end()
