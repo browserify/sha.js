@@ -36,6 +36,23 @@ function makeTest(alg, i, verbose) {
       v[alg]
     )
 
+    var j, buf3
+
+    i    = ~~(buf.length / 3)
+    j    = ~~(buf.length * 2 / 3)
+    buf1 = buf.slice(0, i)
+    buf2 = buf.slice(i, j)
+    buf3 = buf.slice(j, buf.length)
+
+    t.equal(
+      createHash(alg)
+        .update(buf1)
+        .update(buf2)
+        .update(buf3)
+        .digest('hex'),
+      v[alg]
+    )
+
     setTimeout(function () {
       //avoid "too much recursion" errors in tape in firefox
       t.end()
