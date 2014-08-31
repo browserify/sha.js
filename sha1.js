@@ -54,7 +54,7 @@ module.exports = function (Buffer, Hash) {
   // and that if it is the last block, it already has the length and the 1 bit appended.
 
 
-  var isDV = new Buffer(1) instanceof DataView
+  var isDV = (typeof DataView !== 'undefined') && (new Buffer(1) instanceof DataView)
   function readInt32BE (X, i) {
     return isDV
       ? X.getInt32(i, false)
