@@ -21,7 +21,7 @@ function makeTest(alg, i, verbose) {
     var buf = new Buffer(v.input, 'base64')
     t.equal(createHash(alg).update(buf).digest('hex'), v[alg])
 
-    var i = ~~(buf.length / 2)
+    i = ~~(buf.length / 2)
     var buf1 = buf.slice(0, i)
     var buf2 = buf.slice(i, buf.length)
 
@@ -58,7 +58,7 @@ function makeTest(alg, i, verbose) {
       t.end()
     })
   })
-  
+
 }
 
 if(process.argv[2])
@@ -67,6 +67,7 @@ else
   vectors.forEach(function (v, i) {
     makeTest('sha1', i)
     makeTest('sha256', i)
+    makeTest('sha512', i)
   })
 
 

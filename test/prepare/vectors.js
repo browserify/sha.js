@@ -25,10 +25,13 @@ var hashes = {}
 var expected = []
 
 for (var i = 0; i < vectors.length; i++) {
+  var sha512 = crypto.createHash('sha512').update(new Buffer(vectors[i])).digest('hex')
+
   expected.push({
     input  : vectors[i].toString('base64'),
     sha1   : hashes.sha1[i],
-    sha256 : hashes.sha256[i]
+    sha256 : hashes.sha256[i],
+    sha512 : sha512
   })
 
   assert.equal(
