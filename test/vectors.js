@@ -3,7 +3,6 @@ var vectors = require('./nist-vectors.json')
 var tape = require('tape')
 //var from = require('bops/typedarray/from')
 var Buffer = require('buffer').Buffer
-var hexpp = require('../hexpp')
 
 var createHash = require('../')
 
@@ -15,7 +14,6 @@ function makeTest(alg, i, verbose) {
       console.log(v)
       console.log('VECTOR', i)
       console.log('INPUT', v.input)
-      console.log(hexpp(new Buffer(v.input, 'base64')))
       console.log(new Buffer(v.input, 'base64').toString('hex'))
     }
     var buf = new Buffer(v.input, 'base64')
