@@ -1,6 +1,5 @@
 var u = require('./util')
 var write = u.write
-var fill = u.zeroFill
 
 module.exports = function (Buffer) {
 
@@ -61,33 +60,30 @@ module.exports = function (Buffer) {
     this._s = s
 
     return this
-
   }
 
   Hash.prototype.digest = function (enc) {
-    var bl = this._blockSize
-    var fl = this._finalSize
-    var len = this._len*8
+    // Suppose the length of the message M, in bits, is l
+    var l = this._len * 8
 
-    var x = this._block
+    // Append the bit 1 to the end of the message
+    this._block[this._len % this._blockSize] = 0x80
 
-    var bits = len % (bl*8)
+    // and then k zero bits, where k is the smallest non-negative solution to the equation (l + 1 + k) === finalSize mod blockSize
+    this._block.fill(0, this._len % this._blockSize + 1)
 
-    //add end marker, so that appending 0's creats a different hash.
-    x[this._len % bl] = 0x80
-    fill(this._block, this._len % bl + 1)
-
-    if(bits >= fl*8) {
+    if (l % (this._blockSize * 8) >= this._finalSize * 8) {
       this._update(this._block)
-      u.zeroFill(this._block, 0)
+      this._block.fill(0)
     }
 
-    //TODO: handle case where the bit length is > Math.pow(2, 29)
-    x.writeInt32BE(len, fl + 4) //big endian
+    // to this append the block which is equal to the number l written in binary
+    // TODO: handle case where l is > Math.pow(2, 29)
+    this._block.writeInt32BE(l, this._blockSize - 4)
 
     var hash = this._update(this._block) || this._hash()
-    if(enc == null) return hash
-    return hash.toString(enc)
+
+    return enc ? hash.toString(enc) : hash
   }
 
   Hash.prototype._update = function () {
