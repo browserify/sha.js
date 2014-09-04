@@ -103,8 +103,8 @@ module.exports = function (Buffer, Hash) {
     return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
   }
 
-  Sha256.prototype._update = function(m) {
-    var M = this._block
+  Sha256.prototype._update = function(M) {
+
     var W = this._w
     var a, b, c, d, e, f, g, h
     var T1, T2
