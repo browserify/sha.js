@@ -32,7 +32,7 @@ module.exports = function (Buffer, Hash) {
     if(!(this instanceof Sha1)) return new Sha1()
     this._w = W
     Hash.call(this, 16*4, 14*4)
-  
+
     this._h = null
     this.init()
   }
@@ -61,10 +61,8 @@ module.exports = function (Buffer, Hash) {
       : X.readInt32BE(i)
   }
 
-  Sha1.prototype._update = function (array) {
+  Sha1.prototype._update = function (X) {
 
-    var X = this._block
-    var h = this._h
     var a, b, c, d, e, _a, _b, _c, _d, _e
 
     a = _a = this._a
