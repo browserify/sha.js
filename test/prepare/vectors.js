@@ -28,8 +28,7 @@ for (var i = 0; i < vectors.length; i++) {
   expected.push({
     input  : vectors[i].toString('base64'),
     sha1   : hashes.sha1[i],
-    sha256 : hashes.sha256[i],
-    md4    : hashes.md5[i]
+    sha256 : hashes.sha256[i]
   })
 
   assert.equal(
