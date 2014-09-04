@@ -3,6 +3,7 @@
 Streamable SHA1 hash in pure javascript.
 
 [![build status](https://secure.travis-ci.org/dominictarr/sha.js.png)](http://travis-ci.org/dominictarr/sha.js)
+
 [![testling badge](https://ci.testling.com/dominictarr/sha.js.png)](https://ci.testling.com/dominictarr/sha.js)
 
 ## Example
@@ -20,17 +21,13 @@ but is does update incrementally, so you can hash things larger than ram, and al
 the typedarrays, it uses a constant amount of memory (except when using base64 or utf8 encoding,
 see code comments)
 
+
 ## Acknowledgements
 
 This work is derived from Paul Johnston's ["A JavaScript implementation of the Secure Hash Algorithm"]
 (http://pajhome.org.uk/crypt/md5/sha1.html)
 
-# TODO
 
-* sha256 (and similar)
-* md5
-
-(and any other similar hashes that are close to this model)
 
 ## License
 
