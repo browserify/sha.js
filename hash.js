@@ -15,33 +15,30 @@ module.exports = function (Buffer) {
   }
 
   Hash.prototype.update = function (data, enc) {
-    var bl = this._blockSize
-
     if ("string" === typeof data) {
       enc = enc || "utf8"
       data = new Buffer(data, enc)
     }
 
-    var length = data.length
-
-    var l = this._len += length
+    var l = this._len += data.length
     var s = this._s = (this._s || 0)
     var f = 0
     var buffer = this._block
-    while(s < l) {
-      var t = Math.min(length, f + bl - s%bl)
 
-      var l2 = (t - f)
-      for (var i = 0; i < l2; i++) {
-        buffer[s%bl + i] = data[i + f]
+    while (s < l) {
+      var t = Math.min(data.length, f + this._blockSize - (s % this._blockSize))
+      var ch = (t - f)
+
+      for (var i = 0; i < ch; i++) {
+        buffer[(s % this._blockSize) + i] = data[i + f]
       }
 
-      var ch = (t - f);
-      s += ch;
+      s += ch
       f += ch
 
-      if(!(s%bl))
+      if ((s % this._blockSize) === 0) {
         this._update(buffer)
+      }
     }
     this._s = s
 
