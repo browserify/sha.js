@@ -6,20 +6,16 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
+
+var inherits = require('util').inherits
+
 module.exports = function (Buffer, Hash) {
-
-  var inherits = require('util').inherits
-
-  inherits(Sha1, Hash)
 
   var A = 0|0
   var B = 4|0
   var C = 8|0
   var D = 12|0
   var E = 16|0
-
-  var BE = false
-  var LE = true
 
   var W = new Int32Array(80)
 
@@ -37,6 +33,8 @@ module.exports = function (Buffer, Hash) {
     this.init()
   }
 
+  inherits(Sha1, Hash)
+
   Sha1.prototype.init = function () {
     this._a = 0x67452301
     this._b = 0xefcdab89
@@ -49,18 +47,6 @@ module.exports = function (Buffer, Hash) {
   }
 
   Sha1.prototype._POOL = POOL
-
-  // assume that array is a Uint32Array with length=16,
-  // and that if it is the last block, it already has the length and the 1 bit appended.
-
-
-  var isDV = (typeof DataView !== 'undefined') && (new Buffer(1) instanceof DataView)
-  function readInt32BE (X, i) {
-    return isDV
-      ? X.getInt32(i, false)
-      : X.readInt32BE(i)
-  }
-
   Sha1.prototype._update = function (X) {
 
     var a, b, c, d, e, _a, _b, _c, _d, _e
@@ -74,18 +60,13 @@ module.exports = function (Buffer, Hash) {
     var w = this._w
 
     for(var j = 0; j < 80; j++) {
-      var W = w[j]
-        = j < 16
-        //? X.getInt32(j*4, false)
-        //? readInt32BE(X, j*4) //*/ X.readInt32BE(j*4) //*/
-        ? X.readInt32BE(j*4)
+      var W = w[j] = j < 16 ? X.readInt32BE(j*4)
         : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
 
-      var t =
-        add(
-          add(rol(a, 5), sha1_ft(j, b, c, d)),
-          add(add(e, W), sha1_kt(j))
-        );
+      var t = add(
+        add(rol(a, 5), sha1_ft(j, b, c, d)),
+        add(add(e, W), sha1_kt(j))
+      )
 
       e = d
       d = c
