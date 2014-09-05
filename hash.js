@@ -63,25 +63,29 @@ module.exports = function (Buffer) {
   }
 
   Hash.prototype.digest = function (enc) {
+    var block = this._block
+    var blockSize = this._blockSize
+    var mLength = this._len
+
     // Suppose the length of the message M, in bits, is l
-    var l = this._len * 8
+    var l = mLength * 8
 
     // Append the bit 1 to the end of the message
-    this._block[this._len % this._blockSize] = 0x80
+    block[mLength % blockSize] = 0x80
 
     // and then k zero bits, where k is the smallest non-negative solution to the equation (l + 1 + k) === finalSize mod blockSize
-    this._block.fill(0, this._len % this._blockSize + 1)
+    block.fill(0, mLength % blockSize + 1)
 
-    if (l % (this._blockSize * 8) >= this._finalSize * 8) {
-      this._update(this._block)
-      this._block.fill(0)
+    if (l % (blockSize * 8) >= this._finalSize * 8) {
+      this._update(block)
+      block.fill(0)
     }
 
     // to this append the block which is equal to the number l written in binary
     // TODO: handle case where l is > Math.pow(2, 29)
-    this._block.writeInt32BE(l, this._blockSize - 4)
+    block.writeInt32BE(l, blockSize - 4)
 
-    var hash = this._update(this._block) || this._hash()
+    var hash = this._update(block) || this._hash()
 
     return enc ? hash.toString(enc) : hash
   }
