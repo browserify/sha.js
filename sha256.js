@@ -31,7 +31,6 @@ module.exports = function (Buffer, Hash) {
     ]
 
   var W = new Array(64)
-  var POOL = []
 
   function Sha256() {
     this.init()
@@ -129,9 +128,6 @@ module.exports = function (Buffer, Hash) {
   };
 
   Sha256.prototype._hash = function () {
-    if(POOL.length < 10)
-      POOL.push(this)
-
     var H = new Buffer(32)
 
     H.writeInt32BE(this._a,  0)

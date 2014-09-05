@@ -44,7 +44,6 @@ module.exports = function (Buffer, Hash) {
     0x5fcb6fab, 0x3ad6faec, 0x6c44198c, 0x4a475817
   ]
 
-  var POOL = []
   var W = new Array(160)
 
   function Sha512() {
@@ -221,9 +220,6 @@ module.exports = function (Buffer, Hash) {
   }
 
   Sha512.prototype._hash = function () {
-    if (POOL.length < 10)
-      POOL.push(this)
-
     var H = new Buffer(64)
 
     function writeInt64BE(h, l, offset) {
