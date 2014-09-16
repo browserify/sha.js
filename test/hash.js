@@ -1,5 +1,4 @@
 var hexpp = require('../hexpp').defaults({bigendian: false})
-var u = require('../util')
 var tape = require('tape')
 var Buffer = require('buffer/').Buffer
 var Hash = require('../hash')(Buffer)
@@ -38,7 +37,7 @@ var hh = 'abcdefhijklmnopq'
 var multi = {
       strings: ['abcd', 'efhijk', 'lmnopq'],
       buffers: [
-        toBuffer('abcdefhijklmnopq', 'ascii'),
+        new Buffer('abcdefhijklmnopq', 'ascii'),
         new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  0,  128
@@ -57,13 +56,6 @@ var long = {
         ])
       ]
     }
-
-
-function toBuffer (string, enc) {
-  var a = new Buffer(string.length)
-  u.write(a, string, enc, 0, 0, string.length, true)
-  return a
-}
 
 function makeTest(name, data) {
   tape(name, function (t) {
