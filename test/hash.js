@@ -1,5 +1,3 @@
-var hexpp = require('../hexpp').defaults({bigendian: false})
-var u = require('../util')
 var tape = require('tape')
 var Buffer = require('buffer/').Buffer
 var Hash = require('../hash')(Buffer)
@@ -33,12 +31,11 @@ var empty = {
         ])
       ]
     }
-var hh = 'abcdefhijklmnopq'
 
 var multi = {
       strings: ['abcd', 'efhijk', 'lmnopq'],
       buffers: [
-        toBuffer('abcdefhijklmnopq', 'ascii'),
+        new Buffer('abcdefhijklmnopq', 'ascii'),
         new Buffer([
          128,  0,  0,  0,    0,  0,  0,  0,
            0,  0,  0,  0,    0,  0,  0,  128
@@ -58,13 +55,6 @@ var long = {
       ]
     }
 
-
-function toBuffer (string, enc) {
-  var a = new Buffer(string.length)
-  u.write(a, string, enc, 0, 0, string.length, true)
-  return a
-}
-
 function makeTest(name, data) {
   tape(name, function (t) {
 
@@ -76,9 +66,9 @@ function makeTest(name, data) {
     h._update = function (block) {
       var e = expected.shift()
       console.error('---block---')
-      console.error(hexpp(block), block.length)
+      console.error(block.toString('hex'), block.length)
       console.error('---e---')
-      console.error(hexpp(e), block.length)
+      console.error(block.toString('hex'), block.length)
       console.log(block)
       equal(t, block, e)
       if(n < 0)
@@ -101,4 +91,3 @@ makeTest('Hash#update 1 in 1', count16)
 makeTest('empty Hash#update', empty)
 makeTest('Hash#update 1 in 3', multi)
 makeTest('Hash#update 2 in 1', long)
-

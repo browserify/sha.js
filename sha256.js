@@ -8,9 +8,6 @@
  */
 
 var inherits = require('util').inherits
-var BE       = false
-var LE       = true
-var u        = require('./util')
 
 module.exports = function (Buffer, Hash) {
 
@@ -33,21 +30,17 @@ module.exports = function (Buffer, Hash) {
       0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
     ]
 
-  inherits(Sha256, Hash)
   var W = new Array(64)
-  var POOL = []
-  function Sha256() {
-    if(POOL.length) {
-      //return POOL.shift().init()
-    }
-    //this._data = new Buffer(32)
 
+  function Sha256() {
     this.init()
 
     this._w = W //new Array(64)
 
     Hash.call(this, 16*4, 14*4)
-  };
+  }
+
+  inherits(Sha256, Hash)
 
   Sha256.prototype.init = function () {
 
@@ -63,12 +56,6 @@ module.exports = function (Buffer, Hash) {
     this._len = this._s = 0
 
     return this
-  }
-
-  var safe_add = function(x, y) {
-    var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-    var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-    return (msw << 16) | (lsw & 0xFFFF);
   }
 
   function S (X, n) {
@@ -103,8 +90,8 @@ module.exports = function (Buffer, Hash) {
     return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
   }
 
-  Sha256.prototype._update = function(m) {
-    var M = this._block
+  Sha256.prototype._update = function(M) {
+
     var W = this._w
     var a, b, c, d, e, f, g, h
     var T1, T2
@@ -141,9 +128,6 @@ module.exports = function (Buffer, Hash) {
   };
 
   Sha256.prototype._hash = function () {
-    if(POOL.length < 10)
-      POOL.push(this)
-
     var H = new Buffer(32)
 
     H.writeInt32BE(this._a,  0)

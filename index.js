@@ -7,6 +7,6 @@ var exports = module.exports = function (alg) {
 var Buffer = require('buffer').Buffer
 var Hash   = require('./hash')(Buffer)
 
-exports.sha =
 exports.sha1 = require('./sha1')(Buffer, Hash)
 exports.sha256 = require('./sha256')(Buffer, Hash)
+exports.sha512 = require('./sha512')(Buffer, Hash)
