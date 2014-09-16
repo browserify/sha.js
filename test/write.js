@@ -2,9 +2,10 @@ var tape = require('tape')
 var write = require('../util').write
 var hexpp = require('../hexpp')
 var u = require('../util')
+var TA = require('typedarray')
 
 function toBuffer (string) {
-  var a = new Uint8Array(string.length)
+  var a = new TA.Uint8Array(string.length)
   for(var i = 0; i < string.length; i++)
     a[i] = string.charCodeAt(i)
   return a
@@ -13,13 +14,13 @@ function toBuffer (string) {
 var zero = '0'.charCodeAt(0)
 var A    = 'a'.charCodeAt(0)
 
-var HELLOTHERE = new Uint8Array([
+var HELLOTHERE = new TA.Uint8Array([
     104, 101, 108, 108,
     111, 32, 116, 104,
     101, 114, 101, 46
   ])
 
-var FOOBARBAZ = new Uint8Array([
+var FOOBARBAZ = new TA.Uint8Array([
     102, 111, 111,
     98, 97, 114,
     98, 97, 112
@@ -39,7 +40,7 @@ var BAZx = BAZ.toString('hex')
 
 tape('hello there, ascii', function (t) {
   var expected = HELLOTHERE
-  var actual = new Uint8Array(12)
+  var actual = new TA.Uint8Array(12)
 
   write(actual, 'hello there.', 'ascii', 0, 0, 12)
 
@@ -52,7 +53,7 @@ tape('hello there, ascii', function (t) {
 })
 
 tape('foobarbaz, ascii', function (t) {
-  var actual = new Uint8Array(9)
+  var actual = new TA.Uint8Array(9)
   var expected = FOOBARBAZ
   write(actual, 'foo', 'ascii', 0, 0, 3)
   write(actual, 'bar', 'ascii', 3, 0, 3)
@@ -71,7 +72,7 @@ function equal(t, a,b) {
 }
 
 tape('foobarbaz, ascii', function (t) {
-  var actual = new Uint8Array(9)
+  var actual = new TA.Uint8Array(9)
   var expected = FOOBARBAZ
   write(actual, FOO, null, 0, 0, 3)
   write(actual, BAR, null, 3, 0, 3)
@@ -81,7 +82,7 @@ tape('foobarbaz, ascii', function (t) {
 })
 
 tape('foobarbaz, hex', function (t) {
-  var actual = new Uint8Array(9)
+  var actual = new TA.Uint8Array(9)
   var expected = FOOBARBAZ
   write(actual, FOOx, 'hex', 0, 0, 3)
   write(actual, BARx, 'hex', 3, 0, 3)

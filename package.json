@@ -8,7 +8,9 @@
     "url": "git://github.com/dominictarr/sha.js.git"
   },
   "dependencies": {
-    "buffer": "~2.3.2"
+    "buffer": "~2.3.2",
+    "global": "^4.2.1",
+    "typedarray": "0.0.6"
   },
   "devDependencies": {
     "tape": "~2.3.2"
