@@ -8,7 +8,6 @@
  */
 
 var inherits = require('util').inherits
-var global = require('global')
 
 module.exports = function (Buffer, Hash) {
 
@@ -18,7 +17,7 @@ module.exports = function (Buffer, Hash) {
   var D = 12|0
   var E = 16|0
 
-  var W = new (global.Int32Array || Array)(80)
+  var W = new (typeof Int32Array === 'undefined' ? Array : Int32Array)(80)
 
   var POOL = []
 
