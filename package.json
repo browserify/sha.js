@@ -7,9 +7,7 @@
     "type": "git",
     "url": "git://github.com/dominictarr/sha.js.git"
   },
-  "dependencies": {
-    "global": "^4.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "buffer": "~2.3.2",
     "typedarray": "0.0.6",
