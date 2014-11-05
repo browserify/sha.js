@@ -1,5 +1,5 @@
 
-var vectors = require('./nist-vectors.json')
+var vectors = require('hash-test-vectors')
 var tape = require('tape')
 //var from = require('bops/typedarray/from')
 var Buffer = require('buffer').Buffer
