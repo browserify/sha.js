@@ -66,7 +66,9 @@ if(process.argv[2])
 else
   vectors.forEach(function (v, i) {
     makeTest('sha1', i)
+    makeTest('sha224', i)
     makeTest('sha256', i)
+    makeTest('sha384', i)
     makeTest('sha512', i)
   })
 

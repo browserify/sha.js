@@ -8,5 +8,7 @@ var Buffer = require('buffer').Buffer
 var Hash   = require('./hash')(Buffer)
 
 exports.sha1 = require('./sha1')(Buffer, Hash)
+exports.sha224 = require('./sha224')(Buffer, Hash)
 exports.sha256 = require('./sha256')(Buffer, Hash)
+exports.sha384 = require('./sha384')(Buffer, Hash)
 exports.sha512 = require('./sha512')(Buffer, Hash)
