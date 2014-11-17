@@ -1,7 +1,6 @@
 var hexpp = require('../hexpp').defaults({bigendian: false})
 var tape = require('tape')
-var Buffer = require('buffer/').Buffer
-var Hash = require('../hash')(Buffer)
+var Hash = require('../hash')
 
 var hex = '0A1B2C3D4E5F6G7H', hexbuf
 function equal(t, a, b) {
