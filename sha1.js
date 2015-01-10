@@ -7,7 +7,7 @@
  * See http://pajhome.org.uk/crypt/md5 for details.
  */
 
-var inherits = require('util').inherits
+var inherits = require('inherits')
 
 var Hash = require('./hash')
 

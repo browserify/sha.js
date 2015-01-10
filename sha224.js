@@ -7,7 +7,7 @@
  *
  */
 
-var inherits = require('util').inherits
+var inherits = require('inherits')
 var SHA256 = require('./sha256')
 var Hash = require('./hash')
 

@@ -7,7 +7,9 @@
     "type": "git",
     "url": "git://github.com/dominictarr/sha.js.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "inherits": "^2.0.1"
+  },
   "devDependencies": {
     "buffer": "~2.3.2",
     "hash-test-vectors": "^1.3.1",

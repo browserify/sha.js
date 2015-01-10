@@ -1,4 +1,4 @@
-var inherits = require('util').inherits
+var inherits = require('inherits')
 
 var Hash = require('./hash')
 
