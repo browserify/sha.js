@@ -91,26 +91,24 @@ function Maj (x, y, z) {
 
 Sha512.prototype._update = function(M) {
   var W = this._w
-  var a, b, c, d, e, f, g, h
-  var al, bl, cl, dl, el, fl, gl, hl
 
-  a = this._a | 0
-  b = this._b | 0
-  c = this._c | 0
-  d = this._d | 0
-  e = this._e | 0
-  f = this._f | 0
-  g = this._g | 0
-  h = this._h | 0
+  var a = this._a | 0
+  var b = this._b | 0
+  var c = this._c | 0
+  var d = this._d | 0
+  var e = this._e | 0
+  var f = this._f | 0
+  var g = this._g | 0
+  var h = this._h | 0
 
-  al = this._al | 0
-  bl = this._bl | 0
-  cl = this._cl | 0
-  dl = this._dl | 0
-  el = this._el | 0
-  fl = this._fl | 0
-  gl = this._gl | 0
-  hl = this._hl | 0
+  var al = this._al | 0
+  var bl = this._bl | 0
+  var cl = this._cl | 0
+  var dl = this._dl | 0
+  var el = this._el | 0
+  var fl = this._fl | 0
+  var gl = this._gl | 0
+  var hl = this._hl | 0
 
   for (var i = 0; i < 80; i++) {
     var j = i * 2

@@ -87,17 +87,16 @@ function Gamma1256 (x) {
 
 Sha256.prototype._update = function(M) {
   var W = this._w
-  var a, b, c, d, e, f, g, h
   var T1, T2
 
-  a = this._a | 0
-  b = this._b | 0
-  c = this._c | 0
-  d = this._d | 0
-  e = this._e | 0
-  f = this._f | 0
-  g = this._g | 0
-  h = this._h | 0
+  var a = this._a | 0
+  var b = this._b | 0
+  var c = this._c | 0
+  var d = this._d | 0
+  var e = this._e | 0
+  var f = this._f | 0
+  var g = this._g | 0
+  var h = this._h | 0
 
   for (var j = 0; j < 64; j++) {
     var w = W[j] = j < 16

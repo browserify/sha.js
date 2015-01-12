@@ -12,7 +12,7 @@ var Hash = require('./hash')
 
 var W = new Array(80)
 
-function Sha1 () {
+function Sha1() {
   this.init()
   this._w = W
 
@@ -61,13 +61,12 @@ function rol(num, cnt) {
 
 Sha1.prototype._update = function (M) {
   var W = this._w
-  var a, b, c, d, e
 
-  a = this._a
-  b = this._b
-  c = this._c
-  d = this._d
-  e = this._e
+  var a = this._a
+  var b = this._b
+  var c = this._c
+  var d = this._d
+  var e = this._e
 
   for (var j = 0; j < 80; j++) {
     var w = W[j] = j < 16
