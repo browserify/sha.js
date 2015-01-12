@@ -46,8 +46,10 @@ function sha1_ft(t, b, c, d) {
  * Determine the appropriate additive constant for the current iteration
  */
 function sha1_kt(t) {
-    return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
-           (t < 60) ? -1894007588 : -899497514;
+  if (t < 20) return 1518500249
+  if (t < 40) return 1859775393
+  if (t < 60) return -1894007588
+  return -899497514
 }
 
 /*
