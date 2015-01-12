@@ -32,27 +32,6 @@ Sha1.prototype.init = function () {
 }
 
 /*
- * Perform the appropriate triplet combination function for the current
- * iteration
- */
-function sha1_ft(t, b, c, d) {
-  if (t < 20) return (b & c) | ((~b) & d);
-  if (t < 40) return b ^ c ^ d;
-  if (t < 60) return (b & c) | (b & d) | (c & d);
-  return b ^ c ^ d;
-}
-
-/*
- * Determine the appropriate additive constant for the current iteration
- */
-function sha1_kt(t) {
-  if (t < 20) return 1518500249
-  if (t < 40) return 1859775393
-  if (t < 60) return -1894007588
-  return -899497514
-}
-
-/*
  * Bitwise rotate a 32-bit number to the left.
  */
 function rol(num, cnt) {
@@ -73,10 +52,25 @@ Sha1.prototype._update = function (M) {
       ? M.readInt32BE(j * 4)
       : rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
 
-    var t = (
-      ((rol(a, 5) + sha1_ft(j, b, c, d)) | 0) +
-      ((((e + w) | 0) + sha1_kt(j)) | 0)
-    )
+    var f, k
+    if (j < 20) {
+      f = (b & c) | ((~b) & d)
+      k = 1518500249
+
+    } else if (j < 40) {
+      f = b ^ c ^ d
+      k = 1859775393
+
+    } else if (j < 60) {
+      f = (b & c) | (b & d) | (c & d)
+      k = -1894007588
+
+    } else {
+      f = b ^ c ^ d
+      k = -899497514
+    }
+
+    var t = (rol(a, 5) + f + e + w + k) | 0
 
     e = d
     d = c
