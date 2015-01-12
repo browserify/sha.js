@@ -47,81 +47,31 @@ Sha1.prototype._update = function (M) {
   var d = this._d
   var e = this._e
 
-  var w, f, k, t, j = 0
-  while (j < 16) {
-    w = W[j] = M.readInt32BE(j * 4)
-    f = (b & c) | ((~b) & d)
-    k = 1518500249
-    t = (rol(a, 5) + f + e + w + k) | 0
+  var j = 0, k
+
+  function calcW() { return rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1) }
+  function loop(w, f) {
+    W[j] = w
+
+    var t = rol(a, 5) + f + e + w + k
 
     e = d
     d = c
     c = rol(b, 30)
     b = a
     a = t
-
     j++
   }
 
-  while (j < 20) {
-    w = W[j] = rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
-    f = (b & c) | ((~b) & d)
-    k = 1518500249
-    t = (rol(a, 5) + f + e + w + k) | 0
-
-    e = d
-    d = c
-    c = rol(b, 30)
-    b = a
-    a = t
-
-    j++
-  }
-
-  while (j < 40) {
-    w = W[j] = rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
-    f = b ^ c ^ d
-    k = 1859775393
-    t = (rol(a, 5) + f + e + w + k) | 0
-
-    e = d
-    d = c
-    c = rol(b, 30)
-    b = a
-    a = t
-
-    j++
-  }
-
-  while (j < 60) {
-    w = W[j] = rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
-    f = (b & c) | (b & d) | (c & d)
-    k = -1894007588
-    t = (rol(a, 5) + f + e + w + k) | 0
-
-    e = d
-    d = c
-    c = rol(b, 30)
-    b = a
-    a = t
-
-    j++
-  }
-
-  while (j < 80) {
-    w = W[j] = rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
-    f = b ^ c ^ d
-    k = -899497514
-    t = (rol(a, 5) + f + e + w + k) | 0
-
-    e = d
-    d = c
-    c = rol(b, 30)
-    b = a
-    a = t
-
-    j++
-  }
+  k = 1518500249
+  while (j < 16) loop(M.readInt32BE(j * 4), (b & c) | ((~b) & d))
+  while (j < 20) loop(calcW(), (b & c) | ((~b) & d))
+  k = 1859775393
+  while (j < 40) loop(calcW(), b ^ c ^ d)
+  k = -1894007588
+  while (j < 60) loop(calcW(), (b & c) | (b & d) | (c & d))
+  k = -899497514
+  while (j < 80) loop(calcW(), b ^ c ^ d)
 
   this._a = (a + this._a) | 0
   this._b = (b + this._b) | 0
