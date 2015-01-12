@@ -1,4 +1,3 @@
-
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -16,15 +15,14 @@ var W = new Array(64)
 function Sha224() {
   this.init()
 
-  this._w = W //new Array(64)
+  this._w = W // new Array(64)
 
-  Hash.call(this, 16*4, 14*4)
+  Hash.call(this, 64, 56)
 }
 
 inherits(Sha224, SHA256)
 
 Sha224.prototype.init = function () {
-
   this._a = 0xc1059ed8|0
   this._b = 0x367cd507|0
   this._c = 0x3070dd17|0
@@ -34,11 +32,8 @@ Sha224.prototype.init = function () {
   this._g = 0x64f98fa7|0
   this._h = 0xbefa4fa4|0
 
-  this._len = this._s = 0
-
   return this
 }
-
 
 Sha224.prototype._hash = function () {
   var H = new Buffer(28)

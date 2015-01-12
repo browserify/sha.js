@@ -1,5 +1,3 @@
-
-
 //prototype class for hash functions
 function Hash (blockSize, finalSize) {
   this._block = new Buffer(blockSize) //new Uint32Array(blockSize/4)
@@ -9,11 +7,6 @@ function Hash (blockSize, finalSize) {
   this._s = 0
 }
 
-Hash.prototype.init = function () {
-  this._s = 0
-  this._len = 0
-}
-
 Hash.prototype.update = function (data, enc) {
   if ("string" === typeof data) {
     enc = enc || "utf8"
@@ -21,7 +14,7 @@ Hash.prototype.update = function (data, enc) {
   }
 
   var l = this._len += data.length
-  var s = this._s = (this._s || 0)
+  var s = this._s || 0
   var f = 0
   var buffer = this._block
 

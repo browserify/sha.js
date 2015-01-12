@@ -8,29 +8,15 @@
  */
 
 var inherits = require('inherits')
-
 var Hash = require('./hash')
 
-var A = 0|0
-var B = 4|0
-var C = 8|0
-var D = 12|0
-var E = 16|0
-
-var W = new (typeof Int32Array === 'undefined' ? Array : Int32Array)(80)
-
-var POOL = []
+var W = new Array(80)
 
 function Sha1 () {
-  if(POOL.length)
-    return POOL.pop().init()
-
-  if(!(this instanceof Sha1)) return new Sha1()
-  this._w = W
-  Hash.call(this, 16*4, 14*4)
-
-  this._h = null
   this.init()
+  this._w = W
+
+  Hash.call(this, 64, 56)
 }
 
 inherits(Sha1, Hash)
@@ -42,30 +28,53 @@ Sha1.prototype.init = function () {
   this._d = 0x10325476
   this._e = 0xc3d2e1f0
 
-  Hash.prototype.init.call(this)
   return this
 }
 
-Sha1.prototype._POOL = POOL
-Sha1.prototype._update = function (X) {
+/*
+ * Perform the appropriate triplet combination function for the current
+ * iteration
+ */
+function sha1_ft(t, b, c, d) {
+  if (t < 20) return (b & c) | ((~b) & d);
+  if (t < 40) return b ^ c ^ d;
+  if (t < 60) return (b & c) | (b & d) | (c & d);
+  return b ^ c ^ d;
+}
 
-  var a, b, c, d, e, _a, _b, _c, _d, _e
+/*
+ * Determine the appropriate additive constant for the current iteration
+ */
+function sha1_kt(t) {
+    return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
+           (t < 60) ? -1894007588 : -899497514;
+}
 
-  a = _a = this._a
-  b = _b = this._b
-  c = _c = this._c
-  d = _d = this._d
-  e = _e = this._e
+/*
+ * Bitwise rotate a 32-bit number to the left.
+ */
+function rol(num, cnt) {
+  return (num << cnt) | (num >>> (32 - cnt));
+}
 
-  var w = this._w
+Sha1.prototype._update = function (M) {
+  var W = this._w
+  var a, b, c, d, e
 
-  for(var j = 0; j < 80; j++) {
-    var W = w[j] = j < 16 ? X.readInt32BE(j*4)
-      : rol(w[j - 3] ^ w[j -  8] ^ w[j - 14] ^ w[j - 16], 1)
+  a = this._a
+  b = this._b
+  c = this._c
+  d = this._d
+  e = this._e
 
-    var t = add(
-      add(rol(a, 5), sha1_ft(j, b, c, d)),
-      add(add(e, W), sha1_kt(j))
+  for (var j = 0; j < 80; j++) {
+    var w = W[j] = j < 16
+      ? M.readInt32BE(j * 4)
+      : rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1)
+
+    var t = (
+      ((rol(a, 5) + sha1_ft(j, b, c, d)) | 0) +
+      ((((e + w) | 0) + sha1_kt(j)) | 0)
     )
 
     e = d
@@ -75,63 +84,23 @@ Sha1.prototype._update = function (X) {
     a = t
   }
 
-  this._a = add(a, _a)
-  this._b = add(b, _b)
-  this._c = add(c, _c)
-  this._d = add(d, _d)
-  this._e = add(e, _e)
+  this._a = (a + this._a) | 0
+  this._b = (b + this._b) | 0
+  this._c = (c + this._c) | 0
+  this._d = (d + this._d) | 0
+  this._e = (e + this._e) | 0
 }
 
 Sha1.prototype._hash = function () {
-  if(POOL.length < 100) POOL.push(this)
   var H = new Buffer(20)
-  //console.log(this._a|0, this._b|0, this._c|0, this._d|0, this._e|0)
-  H.writeInt32BE(this._a|0, A)
-  H.writeInt32BE(this._b|0, B)
-  H.writeInt32BE(this._c|0, C)
-  H.writeInt32BE(this._d|0, D)
-  H.writeInt32BE(this._e|0, E)
+
+  H.writeInt32BE(this._a|0, 0)
+  H.writeInt32BE(this._b|0, 4)
+  H.writeInt32BE(this._c|0, 8)
+  H.writeInt32BE(this._d|0, 12)
+  H.writeInt32BE(this._e|0, 16)
+
   return H
-}
-
-/*
- * Perform the appropriate triplet combination function for the current
- * iteration
- */
-function sha1_ft(t, b, c, d) {
-  if(t < 20) return (b & c) | ((~b) & d);
-  if(t < 40) return b ^ c ^ d;
-  if(t < 60) return (b & c) | (b & d) | (c & d);
-  return b ^ c ^ d;
-}
-
-/*
- * Determine the appropriate additive constant for the current iteration
- */
-function sha1_kt(t) {
-  return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
-         (t < 60) ? -1894007588 : -899497514;
-}
-
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- * //dominictarr: this is 10 years old, so maybe this can be dropped?)
- *
- */
-function add(x, y) {
-  return (x + y ) | 0
-//lets see how this goes on testling.
-//  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-//  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-//  return (msw << 16) | (lsw & 0xFFFF);
-}
-
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-function rol(num, cnt) {
-  return (num << cnt) | (num >>> (32 - cnt));
 }
 
 module.exports = Sha1

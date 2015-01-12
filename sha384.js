@@ -14,7 +14,6 @@ function Sha384() {
 inherits(Sha384, SHA512)
 
 Sha384.prototype.init = function () {
-
   this._a = 0xcbbb9d5d|0
   this._b = 0x629a292a|0
   this._c = 0x9159015a|0
@@ -33,12 +32,8 @@ Sha384.prototype.init = function () {
   this._gl = 0x64f98fa7|0
   this._hl = 0xbefa4fa4|0
 
-  this._len = this._s = 0
-
   return this
 }
-
-
 
 Sha384.prototype._hash = function () {
   var H = new Buffer(48)

@@ -1,5 +1,4 @@
 var inherits = require('inherits')
-
 var Hash = require('./hash')
 
 var K = [
@@ -57,7 +56,6 @@ function Sha512() {
 inherits(Sha512, Hash)
 
 Sha512.prototype.init = function () {
-
   this._a = 0x6a09e667|0
   this._b = 0xbb67ae85|0
   this._c = 0x3c6ef372|0
@@ -76,8 +74,6 @@ Sha512.prototype.init = function () {
   this._gl = 0xfb41bd6b|0
   this._hl = 0x137e2179|0
 
-  this._len = this._s = 0
-
   return this
 }
 
@@ -94,7 +90,6 @@ function Maj (x, y, z) {
 }
 
 Sha512.prototype._update = function(M) {
-
   var W = this._w
   var a, b, c, d, e, f, g, h
   var al, bl, cl, dl, el, fl, gl, hl
