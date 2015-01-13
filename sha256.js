@@ -87,7 +87,6 @@ function Gamma1256 (x) {
 
 Sha256.prototype._update = function(M) {
   var W = this._w
-  var T1, T2
 
   var a = this._a | 0
   var b = this._b | 0
@@ -98,16 +97,29 @@ Sha256.prototype._update = function(M) {
   var g = this._g | 0
   var h = this._h | 0
 
-  for (var j = 0; j < 64; j++) {
-    var w = W[j] = j < 16
-      ? M.readInt32BE(j * 4)
-      : Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16]
+  var j = 0
 
-    T1 = h + Sigma1256(e) + Ch(e, f, g) + K[j] + w
+  function calcW() { return Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16] }
+  function loop(w) {
+    W[j] = w
 
-    T2 = Sigma0256(a) + Maj(a, b, c);
-    h = g; g = f; f = e; e = d + T1; d = c; c = b; b = a; a = T1 + T2;
+    var T1 = h + Sigma1256(e) + Ch(e, f, g) + K[j] + w
+    var T2 = Sigma0256(a) + Maj(a, b, c);
+
+    h = g;
+    g = f;
+    f = e;
+    e = d + T1;
+    d = c;
+    c = b;
+    b = a;
+    a = T1 + T2;
+
+    j++
   }
+
+  while (j < 16) loop(M.readInt32BE(j * 4))
+  while (j < 64) loop(calcW())
 
   this._a = (a + this._a) | 0
   this._b = (b + this._b) | 0
