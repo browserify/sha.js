@@ -110,43 +110,37 @@ Sha512.prototype._update = function(M) {
   var gl = this._gl | 0
   var hl = this._hl | 0
 
-  for (var i = 0; i < 80; i++) {
-    var j = i * 2
+  var i = 0, j = 0
+  var Wi, Wil
+  function calcW() {
+    var x  = W[j - 15*2]
+    var xl = W[j - 15*2 + 1]
+    var gamma0  = S(x, xl, 1) ^ S(x, xl, 8) ^ (x >>> 7)
+    var gamma0l = S(xl, x, 1) ^ S(xl, x, 8) ^ S(xl, x, 7)
 
-    var Wi, Wil
+    x  = W[j - 2*2]
+    xl = W[j - 2*2 + 1]
+    var gamma1  = S(x, xl, 19) ^ S(xl, x, 29) ^ (x >>> 6)
+    var gamma1l = S(xl, x, 19) ^ S(x, xl, 29) ^ S(xl, x, 6)
 
-    if (i < 16) {
-      Wi = W[j] = M.readInt32BE(j * 4)
-      Wil = W[j + 1] = M.readInt32BE(j * 4 + 4)
+    // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
+    var Wi7  = W[j - 7*2]
+    var Wi7l = W[j - 7*2 + 1]
 
-    } else {
-      var x  = W[j - 15*2]
-      var xl = W[j - 15*2 + 1]
-      var gamma0  = S(x, xl, 1) ^ S(x, xl, 8) ^ (x >>> 7)
-      var gamma0l = S(xl, x, 1) ^ S(xl, x, 8) ^ S(xl, x, 7)
+    var Wi16  = W[j - 16*2]
+    var Wi16l = W[j - 16*2 + 1]
 
-      x  = W[j - 2*2]
-      xl = W[j - 2*2 + 1]
-      var gamma1  = S(x, xl, 19) ^ S(xl, x, 29) ^ (x >>> 6)
-      var gamma1l = S(xl, x, 19) ^ S(x, xl, 29) ^ S(xl, x, 6)
+    Wil = gamma0l + Wi7l
+    Wi  = gamma0  + Wi7 + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0)
+    Wil = Wil + gamma1l
+    Wi  = Wi  + gamma1  + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0)
+    Wil = Wil + Wi16l
+    Wi  = Wi  + Wi16 + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0)
+  }
 
-      // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
-      var Wi7  = W[j - 7*2]
-      var Wi7l = W[j - 7*2 + 1]
-
-      var Wi16  = W[j - 16*2]
-      var Wi16l = W[j - 16*2 + 1]
-
-      Wil = gamma0l + Wi7l
-      Wi  = gamma0  + Wi7 + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0)
-      Wil = Wil + gamma1l
-      Wi  = Wi  + gamma1  + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0)
-      Wil = Wil + Wi16l
-      Wi  = Wi  + Wi16 + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0)
-
-      W[j] = Wi
-      W[j + 1] = Wil
-    }
+  function loop() {
+    W[j] = Wi
+    W[j + 1] = Wil
 
     var maj = Maj(a, b, c)
     var majl = Maj(al, bl, cl)
@@ -192,6 +186,21 @@ Sha512.prototype._update = function(M) {
     bl = al
     al = (t1l + t2l) | 0
     a  = (t1 + t2 + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0
+
+    i++
+    j += 2
+  }
+
+  while (i < 16) {
+    Wi = M.readInt32BE(j * 4)
+    Wil = M.readInt32BE(j * 4 + 4)
+
+    loop()
+  }
+
+  while (i < 80) {
+    calcW()
+    loop()
   }
 
   this._al = (this._al + al) | 0
