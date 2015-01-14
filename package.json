@@ -2,10 +2,10 @@
   "name": "sha.js",
   "description": "streaming sha1 hash in pure javascript",
   "version": "2.3.5",
-  "homepage": "https://github.com/dominictarr/sha.js",
+  "homepage": "https://github.com/crypto-browserify/sha.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dominictarr/sha.js.git"
+    "url": "git://github.com/crypto-browserify/sha.js.git"
   },
   "dependencies": {
     "inherits": "^2.0.1"
@@ -22,21 +22,5 @@
     "test": "set -e; for t in test/*.js; do node $t; done;"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
-  "license": "MIT",
-  "testling": {
-    "files": "test/{vectors,write,hash}.js",
-    "browsers": [
-      "ie/8..latest",
-      "firefox/17..latest",
-      "firefox/nightly",
-      "chrome/22..latest",
-      "chrome/canary",
-      "opera/12..latest",
-      "opera/next",
-      "safari/5.1..latest",
-      "ipad/6.0..latest",
-      "iphone/6.0..latest",
-      "android-browser/4.2..latest"
-    ]
-  }
+  "license": "MIT"
 }
