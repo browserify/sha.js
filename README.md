@@ -1,6 +1,6 @@
 # sha.js
 
-Streamable SHA1 hash in pure javascript.
+Streamable SHA hashes in pure javascript.
 
 [![build status](https://secure.travis-ci.org/dominictarr/sha.js.png)](http://travis-ci.org/dominictarr/sha.js)
 
