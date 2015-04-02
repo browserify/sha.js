@@ -5,6 +5,7 @@ var exports = module.exports = function (alg) {
 }
 
 
+exports.sha = require('./sha')
 exports.sha1 = require('./sha1')
 exports.sha224 = require('./sha224')
 exports.sha256 = require('./sha256')
