@@ -11,21 +11,28 @@ Streamable SHA hashes in pure javascript.
 ``` js
 var createHash = require('sha.js')
 
-var sha1 = createHash('sha1')
 var sha256 = createHash('sha256')
 var sha512 = createHash'sha512')
 
 var h = sha1.update('abc', 'utf8').digest('hex')
-console.log(h) //a9993e364706816aba3e25717850c26c9cd0d89d
+console.log(h) //ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+
+//LEGACY, do not use in new systems:
+var sha0 = createHash('sha')
+var sha1 = createHash('sha1')
+
+
 ```
 
 ## supported hashes
 
 sha.js currently implements:
 
-* sha1
+
 * sha256
 * sha512
+* sha1 (legacy, no not use in new systems)
+* sha (legacy, no not use in new systems)
 
 ## Note
 
