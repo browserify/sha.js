@@ -12,7 +12,7 @@ Streamable SHA hashes in pure javascript.
 var createHash = require('sha.js')
 
 var sha256 = createHash('sha256')
-var sha512 = createHash'sha512')
+var sha512 = createHash('sha512')
 
 var h = sha1.update('abc', 'utf8').digest('hex')
 console.log(h) //ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
