@@ -1,17 +1,6 @@
-
 var crypto = require('crypto')
-var tape   = require('tape')
-var Sha1   = require('../').sha1
-var Uint32toHex = Sha1.Uint32toHex
-
-function generateCount (m) {
-  var s = ''
-  for(var i = 0; i < m/8; i++) {
-    console.log('GENERATE', i, Uint32toHex(i))
-    s+=i
-  }
-  return s
-}
+var tape = require('tape')
+var Sha1 = require('../').sha1
 
 var inputs = [
  ['', 'ascii'],
