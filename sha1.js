@@ -12,7 +12,7 @@ var Hash = require('./hash')
 
 var W = new Array(80)
 
-function Sha1() {
+function Sha1 () {
   this.init()
   this._w = W
 
@@ -22,11 +22,11 @@ function Sha1() {
 inherits(Sha1, Hash)
 
 Sha1.prototype.init = function () {
-  this._a = 0x67452301
-  this._b = 0xefcdab89
-  this._c = 0x98badcfe
-  this._d = 0x10325476
-  this._e = 0xc3d2e1f0
+  this._a = 0x67452301 | 0
+  this._b = 0xefcdab89 | 0
+  this._c = 0x98badcfe | 0
+  this._d = 0x10325476 | 0
+  this._e = 0xc3d2e1f0 | 0
 
   return this
 }
@@ -34,8 +34,8 @@ Sha1.prototype.init = function () {
 /*
  * Bitwise rotate a 32-bit number to the left.
  */
-function rol(num, cnt) {
-  return (num << cnt) | (num >>> (32 - cnt));
+function rol (num, cnt) {
+  return (num << cnt) | (num >>> (32 - cnt))
 }
 
 Sha1.prototype._update = function (M) {
@@ -49,8 +49,8 @@ Sha1.prototype._update = function (M) {
 
   var j = 0, k
 
-  function calcW() { return rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1) }
-  function loop(w, f) {
+  function calcW () { return rol(W[j - 3] ^ W[j - 8] ^ W[j - 14] ^ W[j - 16], 1) }
+  function loop (w, f) {
     W[j] = w
 
     var t = rol(a, 5) + f + e + w + k
@@ -83,14 +83,13 @@ Sha1.prototype._update = function (M) {
 Sha1.prototype._hash = function () {
   var H = new Buffer(20)
 
-  H.writeInt32BE(this._a|0, 0)
-  H.writeInt32BE(this._b|0, 4)
-  H.writeInt32BE(this._c|0, 8)
-  H.writeInt32BE(this._d|0, 12)
-  H.writeInt32BE(this._e|0, 16)
+  H.writeInt32BE(this._a | 0, 0)
+  H.writeInt32BE(this._b | 0, 4)
+  H.writeInt32BE(this._c | 0, 8)
+  H.writeInt32BE(this._d | 0, 12)
+  H.writeInt32BE(this._e | 0, 16)
 
   return H
 }
 
 module.exports = Sha1
-
