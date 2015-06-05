@@ -46,7 +46,7 @@ var K = [
 
 var W = new Array(160)
 
-function Sha512() {
+function Sha512 () {
   this.init()
   this._w = W
 
@@ -56,23 +56,23 @@ function Sha512() {
 inherits(Sha512, Hash)
 
 Sha512.prototype.init = function () {
-  this._a = 0x6a09e667|0
-  this._b = 0xbb67ae85|0
-  this._c = 0x3c6ef372|0
-  this._d = 0xa54ff53a|0
-  this._e = 0x510e527f|0
-  this._f = 0x9b05688c|0
-  this._g = 0x1f83d9ab|0
-  this._h = 0x5be0cd19|0
+  this._a = 0x6a09e667 | 0
+  this._b = 0xbb67ae85 | 0
+  this._c = 0x3c6ef372 | 0
+  this._d = 0xa54ff53a | 0
+  this._e = 0x510e527f | 0
+  this._f = 0x9b05688c | 0
+  this._g = 0x1f83d9ab | 0
+  this._h = 0x5be0cd19 | 0
 
-  this._al = 0xf3bcc908|0
-  this._bl = 0x84caa73b|0
-  this._cl = 0xfe94f82b|0
-  this._dl = 0x5f1d36f1|0
-  this._el = 0xade682d1|0
-  this._fl = 0x2b3e6c1f|0
-  this._gl = 0xfb41bd6b|0
-  this._hl = 0x137e2179|0
+  this._al = 0xf3bcc908 | 0
+  this._bl = 0x84caa73b | 0
+  this._cl = 0xfe94f82b | 0
+  this._dl = 0x5f1d36f1 | 0
+  this._el = 0xade682d1 | 0
+  this._fl = 0x2b3e6c1f | 0
+  this._gl = 0xfb41bd6b | 0
+  this._hl = 0x137e2179 | 0
 
   return this
 }
@@ -82,14 +82,14 @@ function S (X, Xl, n) {
 }
 
 function Ch (x, y, z) {
-  return ((x & y) ^ ((~x) & z));
+  return ((x & y) ^ ((~x) & z))
 }
 
 function Maj (x, y, z) {
-  return ((x & y) ^ (x & z) ^ (y & z));
+  return ((x & y) ^ (x & z) ^ (y & z))
 }
 
-Sha512.prototype._update = function(M) {
+Sha512.prototype._update = function (M) {
   var W = this._w
 
   var a = this._a | 0
@@ -112,33 +112,33 @@ Sha512.prototype._update = function(M) {
 
   var i = 0, j = 0
   var Wi, Wil
-  function calcW() {
-    var x  = W[j - 15*2]
-    var xl = W[j - 15*2 + 1]
-    var gamma0  = S(x, xl, 1) ^ S(x, xl, 8) ^ (x >>> 7)
+  function calcW () {
+    var x = W[j - 15 * 2]
+    var xl = W[j - 15 * 2 + 1]
+    var gamma0 = S(x, xl, 1) ^ S(x, xl, 8) ^ (x >>> 7)
     var gamma0l = S(xl, x, 1) ^ S(xl, x, 8) ^ S(xl, x, 7)
 
-    x  = W[j - 2*2]
-    xl = W[j - 2*2 + 1]
-    var gamma1  = S(x, xl, 19) ^ S(xl, x, 29) ^ (x >>> 6)
+    x = W[j - 2 * 2]
+    xl = W[j - 2 * 2 + 1]
+    var gamma1 = S(x, xl, 19) ^ S(xl, x, 29) ^ (x >>> 6)
     var gamma1l = S(xl, x, 19) ^ S(x, xl, 29) ^ S(xl, x, 6)
 
     // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
-    var Wi7  = W[j - 7*2]
-    var Wi7l = W[j - 7*2 + 1]
+    var Wi7 = W[j - 7 * 2]
+    var Wi7l = W[j - 7 * 2 + 1]
 
-    var Wi16  = W[j - 16*2]
-    var Wi16l = W[j - 16*2 + 1]
+    var Wi16 = W[j - 16 * 2]
+    var Wi16l = W[j - 16 * 2 + 1]
 
     Wil = gamma0l + Wi7l
-    Wi  = gamma0  + Wi7 + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0)
+    Wi = gamma0 + Wi7 + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0)
     Wil = Wil + gamma1l
-    Wi  = Wi  + gamma1  + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0)
+    Wi = Wi + gamma1 + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0)
     Wil = Wil + Wi16l
-    Wi  = Wi  + Wi16 + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0)
+    Wi = Wi + Wi16 + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0)
   }
 
-  function loop() {
+  function loop () {
     W[j] = Wi
     W[j + 1] = Wil
 
@@ -170,22 +170,22 @@ Sha512.prototype._update = function(M) {
     var t2l = sigma0l + majl
     var t2 = sigma0h + maj + ((t2l >>> 0) < (sigma0l >>> 0) ? 1 : 0)
 
-    h  = g
+    h = g
     hl = gl
-    g  = f
+    g = f
     gl = fl
-    f  = e
+    f = e
     fl = el
     el = (dl + t1l) | 0
-    e  = (d + t1 + ((el >>> 0) < (dl >>> 0) ? 1 : 0)) | 0
-    d  = c
+    e = (d + t1 + ((el >>> 0) < (dl >>> 0) ? 1 : 0)) | 0
+    d = c
     dl = cl
-    c  = b
+    c = b
     cl = bl
-    b  = a
+    b = a
     bl = al
     al = (t1l + t2l) | 0
-    a  = (t1 + t2 + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0
+    a = (t1 + t2 + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0
 
     i++
     j += 2
@@ -225,7 +225,7 @@ Sha512.prototype._update = function(M) {
 Sha512.prototype._hash = function () {
   var H = new Buffer(64)
 
-  function writeInt64BE(h, l, offset) {
+  function writeInt64BE (h, l, offset) {
     H.writeInt32BE(h, offset)
     H.writeInt32BE(l, offset + 4)
   }

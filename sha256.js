@@ -30,7 +30,7 @@ var K = [
 
 var W = new Array(64)
 
-function Sha256() {
+function Sha256 () {
   this.init()
 
   this._w = W // new Array(64)
@@ -41,51 +41,51 @@ function Sha256() {
 inherits(Sha256, Hash)
 
 Sha256.prototype.init = function () {
-  this._a = 0x6a09e667|0
-  this._b = 0xbb67ae85|0
-  this._c = 0x3c6ef372|0
-  this._d = 0xa54ff53a|0
-  this._e = 0x510e527f|0
-  this._f = 0x9b05688c|0
-  this._g = 0x1f83d9ab|0
-  this._h = 0x5be0cd19|0
+  this._a = 0x6a09e667 | 0
+  this._b = 0xbb67ae85 | 0
+  this._c = 0x3c6ef372 | 0
+  this._d = 0xa54ff53a | 0
+  this._e = 0x510e527f | 0
+  this._f = 0x9b05688c | 0
+  this._g = 0x1f83d9ab | 0
+  this._h = 0x5be0cd19 | 0
 
   return this
 }
 
 function S (X, n) {
-  return (X >>> n) | (X << (32 - n));
+  return (X >>> n) | (X << (32 - n))
 }
 
 function R (X, n) {
-  return (X >>> n);
+  return (X >>> n)
 }
 
 function Ch (x, y, z) {
-  return ((x & y) ^ ((~x) & z));
+  return ((x & y) ^ ((~x) & z))
 }
 
 function Maj (x, y, z) {
-  return ((x & y) ^ (x & z) ^ (y & z));
+  return ((x & y) ^ (x & z) ^ (y & z))
 }
 
 function Sigma0256 (x) {
-  return (S(x, 2) ^ S(x, 13) ^ S(x, 22));
+  return (S(x, 2) ^ S(x, 13) ^ S(x, 22))
 }
 
 function Sigma1256 (x) {
-  return (S(x, 6) ^ S(x, 11) ^ S(x, 25));
+  return (S(x, 6) ^ S(x, 11) ^ S(x, 25))
 }
 
 function Gamma0256 (x) {
-  return (S(x, 7) ^ S(x, 18) ^ R(x, 3));
+  return (S(x, 7) ^ S(x, 18) ^ R(x, 3))
 }
 
 function Gamma1256 (x) {
-  return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
+  return (S(x, 17) ^ S(x, 19) ^ R(x, 10))
 }
 
-Sha256.prototype._update = function(M) {
+Sha256.prototype._update = function (M) {
   var W = this._w
 
   var a = this._a | 0
@@ -99,21 +99,21 @@ Sha256.prototype._update = function(M) {
 
   var j = 0
 
-  function calcW() { return Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16] }
-  function loop(w) {
+  function calcW () { return Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16] }
+  function loop (w) {
     W[j] = w
 
     var T1 = h + Sigma1256(e) + Ch(e, f, g) + K[j] + w
-    var T2 = Sigma0256(a) + Maj(a, b, c);
+    var T2 = Sigma0256(a) + Maj(a, b, c)
 
-    h = g;
-    g = f;
-    f = e;
-    e = d + T1;
-    d = c;
-    c = b;
-    b = a;
-    a = T1 + T2;
+    h = g
+    g = f
+    f = e
+    e = d + T1
+    d = c
+    c = b
+    b = a
+    a = T1 + T2
 
     j++
   }
@@ -129,14 +129,14 @@ Sha256.prototype._update = function(M) {
   this._f = (f + this._f) | 0
   this._g = (g + this._g) | 0
   this._h = (h + this._h) | 0
-};
+}
 
 Sha256.prototype._hash = function () {
   var H = new Buffer(32)
 
-  H.writeInt32BE(this._a,  0)
-  H.writeInt32BE(this._b,  4)
-  H.writeInt32BE(this._c,  8)
+  H.writeInt32BE(this._a, 0)
+  H.writeInt32BE(this._b, 4)
+  H.writeInt32BE(this._c, 8)
   H.writeInt32BE(this._d, 12)
   H.writeInt32BE(this._e, 16)
   H.writeInt32BE(this._f, 20)

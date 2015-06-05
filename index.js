@@ -1,9 +1,11 @@
-var exports = module.exports = function (alg) {
-  var Alg = exports[alg.toLowerCase()]
-  if(!Alg) throw new Error(alg + ' is not supported (we accept pull requests)')
-  return new Alg()
-}
+var exports = module.exports = function SHA (algorithm) {
+  algorithm = algorithm.toLowerCase()
 
+  var Algorithm = exports[algorithm]
+  if (!Algorithm) throw new Error(algorithm + ' is not supported (we accept pull requests)')
+
+  return new Algorithm()
+}
 
 exports.sha = require('./sha')
 exports.sha1 = require('./sha1')
