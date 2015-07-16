@@ -6,6 +6,12 @@ Streamable SHA hashes in pure javascript.
 
 [![testling badge](https://ci.testling.com/dominictarr/sha.js.png)](https://ci.testling.com/dominictarr/sha.js)
 
+## Installing with [NPM](https://npmjs.org/ "NPM")
+
+```
+$ npm install sha.js
+```
+
 ## Example
 
 ``` js
