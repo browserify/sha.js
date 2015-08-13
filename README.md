@@ -3,6 +3,7 @@
 Streamable SHA hashes in pure javascript.
 
 [![build status](https://secure.travis-ci.org/dominictarr/sha.js.png)](http://travis-ci.org/dominictarr/sha.js)
+[![NPM](http://img.shields.io/npm/v/sha.js.svg)](https://www.npmjs.org/package/sha.js)
 
 [![testling badge](https://ci.testling.com/dominictarr/sha.js.png)](https://ci.testling.com/dominictarr/sha.js)
 
