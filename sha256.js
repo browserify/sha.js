@@ -53,36 +53,28 @@ Sha256.prototype.init = function () {
   return this
 }
 
-function S (X, n) {
-  return (X >>> n) | (X << (32 - n))
-}
-
-function R (X, n) {
-  return (X >>> n)
-}
-
 function Ch (x, y, z) {
-  return ((x & y) ^ ((~x) & z))
+  return z ^ (x & (y ^ z))
 }
 
 function Maj (x, y, z) {
-  return ((x & y) ^ (x & z) ^ (y & z))
+  return (x & y) | (z & (x | y))
 }
 
-function Sigma0256 (x) {
-  return (S(x, 2) ^ S(x, 13) ^ S(x, 22))
+function Sigma0 (x) {
+  return (x >>> 2 | x << 30) ^ (x >>> 13 | x << 19) ^ (x >>> 22 | x << 10)
 }
 
-function Sigma1256 (x) {
-  return (S(x, 6) ^ S(x, 11) ^ S(x, 25))
+function Sigma1 (x) {
+  return (x >>> 6 | x << 26) ^ (x >>> 11 | x << 21) ^ (x >>> 25 | x << 7)
 }
 
-function Gamma0256 (x) {
-  return (S(x, 7) ^ S(x, 18) ^ R(x, 3))
+function Gamma0 (x) {
+  return (x >>> 7 | x << 25) ^ (x >>> 18 | x << 14) ^ (x >>> 3)
 }
 
-function Gamma1256 (x) {
-  return (S(x, 17) ^ S(x, 19) ^ R(x, 10))
+function Gamma1 (x) {
+  return (x >>> 17 | x << 15) ^ (x >>> 19 | x << 13) ^ (x >>> 10)
 }
 
 Sha256.prototype._update = function (M) {
@@ -99,12 +91,12 @@ Sha256.prototype._update = function (M) {
 
   var j = 0
 
-  function calcW () { return Gamma1256(W[j - 2]) + W[j - 7] + Gamma0256(W[j - 15]) + W[j - 16] }
+  function calcW () { return Gamma1(W[j - 2]) + W[j - 7] + Gamma0(W[j - 15]) + W[j - 16] }
   function loop (w) {
     W[j] = w
 
-    var T1 = h + Sigma1256(e) + Ch(e, f, g) + K[j] + w
-    var T2 = Sigma0256(a) + Maj(a, b, c)
+    var T1 = h + Sigma1(e) + Ch(e, f, g) + K[j] + w
+    var T2 = Sigma0(a) + Maj(a, b, c)
 
     h = g
     g = f

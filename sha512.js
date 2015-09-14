@@ -77,16 +77,36 @@ Sha512.prototype.init = function () {
   return this
 }
 
-function S (X, Xl, n) {
-  return (X >>> n) | (Xl << (32 - n))
-}
-
 function Ch (x, y, z) {
-  return ((x & y) ^ ((~x) & z))
+  return z ^ (x & (y ^ z))
 }
 
 function Maj (x, y, z) {
-  return ((x & y) ^ (x & z) ^ (y & z))
+  return (x & y) | (z & (x | y))
+}
+
+function Sigma0 (x, xl) {
+  return (x >>> 28 | xl << 4) ^ (xl >>> 2 | x << 30) ^ (xl >>> 7 | x << 25)
+}
+
+function Sigma1 (x, xl) {
+  return (x >>> 14 | xl << 18) ^ (x >>> 18 | xl << 14) ^ (xl >>> 9 | x << 23)
+}
+
+function Gamma0 (x, xl) {
+  return (x >>> 1 | xl << 31) ^ (x >>> 8 | xl << 24) ^ (x >>> 7)
+}
+
+function Gamma0l (x, xl) {
+  return (x >>> 1 | xl << 31) ^ (x >>> 8 | xl << 24) ^ (x >>> 7 | xl << 25)
+}
+
+function Gamma1 (x, xl) {
+  return (x >>> 19 | xl << 13) ^ (xl >>> 29 | x << 3) ^ (x >>> 6)
+}
+
+function Gamma1l (x, xl) {
+  return (x >>> 19 | xl << 13) ^ (xl >>> 29 | x << 3) ^ (x >>> 6 | xl << 26)
 }
 
 Sha512.prototype._update = function (M) {
@@ -116,13 +136,13 @@ Sha512.prototype._update = function (M) {
   function calcW () {
     var x = W[j - 15 * 2]
     var xl = W[j - 15 * 2 + 1]
-    var gamma0 = S(x, xl, 1) ^ S(x, xl, 8) ^ (x >>> 7)
-    var gamma0l = S(xl, x, 1) ^ S(xl, x, 8) ^ S(xl, x, 7)
+    var gamma0 = Gamma0(x, xl)
+    var gamma0l = Gamma0l(xl, x)
 
     x = W[j - 2 * 2]
     xl = W[j - 2 * 2 + 1]
-    var gamma1 = S(x, xl, 19) ^ S(xl, x, 29) ^ (x >>> 6)
-    var gamma1l = S(xl, x, 19) ^ S(x, xl, 29) ^ S(xl, x, 6)
+    var gamma1 = Gamma1(x, xl)
+    var gamma1l = Gamma1l(xl, x)
 
     // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
     var Wi7 = W[j - 7 * 2]
@@ -146,10 +166,10 @@ Sha512.prototype._update = function (M) {
     var maj = Maj(a, b, c)
     var majl = Maj(al, bl, cl)
 
-    var sigma0h = S(a, al, 28) ^ S(al, a, 2) ^ S(al, a, 7)
-    var sigma0l = S(al, a, 28) ^ S(a, al, 2) ^ S(a, al, 7)
-    var sigma1h = S(e, el, 14) ^ S(e, el, 18) ^ S(el, e, 9)
-    var sigma1l = S(el, e, 14) ^ S(el, e, 18) ^ S(e, el, 9)
+    var sigma0h = Sigma0(a, al)
+    var sigma0l = Sigma0(al, a)
+    var sigma1h = Sigma1(e, el)
+    var sigma1l = Sigma1(el, e)
 
     // t1 = h + sigma1 + ch + K[i] + W[i]
     var Ki = K[j]
