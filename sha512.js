@@ -56,23 +56,23 @@ function Sha512 () {
 inherits(Sha512, Hash)
 
 Sha512.prototype.init = function () {
-  this._a = 0x6a09e667 | 0
-  this._b = 0xbb67ae85 | 0
-  this._c = 0x3c6ef372 | 0
-  this._d = 0xa54ff53a | 0
-  this._e = 0x510e527f | 0
-  this._f = 0x9b05688c | 0
-  this._g = 0x1f83d9ab | 0
-  this._h = 0x5be0cd19 | 0
+  this._ah = 0x6a09e667
+  this._bh = 0xbb67ae85
+  this._ch = 0x3c6ef372
+  this._dh = 0xa54ff53a
+  this._eh = 0x510e527f
+  this._fh = 0x9b05688c
+  this._gh = 0x1f83d9ab
+  this._hh = 0x5be0cd19
 
-  this._al = 0xf3bcc908 | 0
-  this._bl = 0x84caa73b | 0
-  this._cl = 0xfe94f82b | 0
-  this._dl = 0x5f1d36f1 | 0
-  this._el = 0xade682d1 | 0
-  this._fl = 0x2b3e6c1f | 0
-  this._gl = 0xfb41bd6b | 0
-  this._hl = 0x137e2179 | 0
+  this._al = 0xf3bcc908
+  this._bl = 0x84caa73b
+  this._cl = 0xfe94f82b
+  this._dl = 0x5f1d36f1
+  this._el = 0xade682d1
+  this._fl = 0x2b3e6c1f
+  this._gl = 0xfb41bd6b
+  this._hl = 0x137e2179
 
   return this
 }
@@ -81,15 +81,15 @@ function Ch (x, y, z) {
   return z ^ (x & (y ^ z))
 }
 
-function Maj (x, y, z) {
+function maj (x, y, z) {
   return (x & y) | (z & (x | y))
 }
 
-function Sigma0 (x, xl) {
+function sigma0 (x, xl) {
   return (x >>> 28 | xl << 4) ^ (xl >>> 2 | x << 30) ^ (xl >>> 7 | x << 25)
 }
 
-function Sigma1 (x, xl) {
+function sigma1 (x, xl) {
   return (x >>> 14 | xl << 18) ^ (x >>> 18 | xl << 14) ^ (xl >>> 9 | x << 23)
 }
 
@@ -109,17 +109,21 @@ function Gamma1l (x, xl) {
   return (x >>> 19 | xl << 13) ^ (xl >>> 29 | x << 3) ^ (x >>> 6 | xl << 26)
 }
 
+function getCarry (a, b) {
+  return (a >>> 0) < (b >>> 0) ? 1 : 0
+}
+
 Sha512.prototype._update = function (M) {
   var W = this._w
 
-  var a = this._a | 0
-  var b = this._b | 0
-  var c = this._c | 0
-  var d = this._d | 0
-  var e = this._e | 0
-  var f = this._f | 0
-  var g = this._g | 0
-  var h = this._h | 0
+  var ah = this._ah | 0
+  var bh = this._bh | 0
+  var ch = this._ch | 0
+  var dh = this._dh | 0
+  var eh = this._eh | 0
+  var fh = this._fh | 0
+  var gh = this._gh | 0
+  var hh = this._hh | 0
 
   var al = this._al | 0
   var bl = this._bl | 0
@@ -130,98 +134,87 @@ Sha512.prototype._update = function (M) {
   var gl = this._gl | 0
   var hl = this._hl | 0
 
-  var i = 0
-  var j = 0
-  var Wi, Wil
-  function calcW () {
-    var x = W[j - 15 * 2]
-    var xl = W[j - 15 * 2 + 1]
-    var gamma0 = Gamma0(x, xl)
-    var gamma0l = Gamma0l(xl, x)
+  for (var i = 0; i < 32; i += 2) {
+    W[i] = M.readInt32BE(i * 4)
+    W[i + 1] = M.readInt32BE(i * 4 + 4)
+  }
+  for (; i < 160; i += 2) {
+    var xh = W[i - 15 * 2]
+    var xl = W[i - 15 * 2 + 1]
+    var gamma0 = Gamma0(xh, xl)
+    var gamma0l = Gamma0l(xl, xh)
 
-    x = W[j - 2 * 2]
-    xl = W[j - 2 * 2 + 1]
-    var gamma1 = Gamma1(x, xl)
-    var gamma1l = Gamma1l(xl, x)
+    xh = W[i - 2 * 2]
+    xl = W[i - 2 * 2 + 1]
+    var gamma1 = Gamma1(xh, xl)
+    var gamma1l = Gamma1l(xl, xh)
 
     // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
-    var Wi7 = W[j - 7 * 2]
-    var Wi7l = W[j - 7 * 2 + 1]
+    var Wi7h = W[i - 7 * 2]
+    var Wi7l = W[i - 7 * 2 + 1]
 
-    var Wi16 = W[j - 16 * 2]
-    var Wi16l = W[j - 16 * 2 + 1]
+    var Wi16h = W[i - 16 * 2]
+    var Wi16l = W[i - 16 * 2 + 1]
 
-    Wil = gamma0l + Wi7l
-    Wi = gamma0 + Wi7 + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0)
-    Wil = Wil + gamma1l
-    Wi = Wi + gamma1 + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0)
-    Wil = Wil + Wi16l
-    Wi = Wi + Wi16 + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0)
+    var Wil = (gamma0l + Wi7l) | 0
+    var Wih = (gamma0 + Wi7h + getCarry(Wil, gamma0l)) | 0
+    Wil = (Wil + gamma1l) | 0
+    Wih = (Wih + gamma1 + getCarry(Wil, gamma1l)) | 0
+    Wil = (Wil + Wi16l) | 0
+    Wih = (Wih + Wi16h + getCarry(Wil, Wi16l)) | 0
+
+    W[i] = Wih
+    W[i + 1] = Wil
   }
 
-  function loop () {
-    W[j] = Wi
-    W[j + 1] = Wil
+  for (var j = 0; j < 160; j += 2) {
+    Wih = W[j]
+    Wil = W[j + 1]
 
-    var maj = Maj(a, b, c)
-    var majl = Maj(al, bl, cl)
+    var majh = maj(ah, bh, ch)
+    var majl = maj(al, bl, cl)
 
-    var sigma0h = Sigma0(a, al)
-    var sigma0l = Sigma0(al, a)
-    var sigma1h = Sigma1(e, el)
-    var sigma1l = Sigma1(el, e)
+    var sigma0h = sigma0(ah, al)
+    var sigma0l = sigma0(al, ah)
+    var sigma1h = sigma1(eh, el)
+    var sigma1l = sigma1(el, eh)
 
-    // t1 = h + sigma1 + ch + K[i] + W[i]
-    var Ki = K[j]
+    // t1 = h + sigma1 + ch + K[j] + W[j]
+    var Kih = K[j]
     var Kil = K[j + 1]
 
-    var ch = Ch(e, f, g)
+    var chh = Ch(eh, fh, gh)
     var chl = Ch(el, fl, gl)
 
-    var t1l = hl + sigma1l
-    var t1 = h + sigma1h + ((t1l >>> 0) < (hl >>> 0) ? 1 : 0)
-    t1l = t1l + chl
-    t1 = t1 + ch + ((t1l >>> 0) < (chl >>> 0) ? 1 : 0)
-    t1l = t1l + Kil
-    t1 = t1 + Ki + ((t1l >>> 0) < (Kil >>> 0) ? 1 : 0)
-    t1l = t1l + Wil
-    t1 = t1 + Wi + ((t1l >>> 0) < (Wil >>> 0) ? 1 : 0)
+    var t1l = (hl + sigma1l) | 0
+    var t1h = (hh + sigma1h + getCarry(t1l, hl)) | 0
+    t1l = (t1l + chl) | 0
+    t1h = (t1h + chh + getCarry(t1l, chl)) | 0
+    t1l = (t1l + Kil) | 0
+    t1h = (t1h + Kih + getCarry(t1l, Kil)) | 0
+    t1l = (t1l + Wil) | 0
+    t1h = (t1h + Wih + getCarry(t1l, Wil)) | 0
 
     // t2 = sigma0 + maj
-    var t2l = sigma0l + majl
-    var t2 = sigma0h + maj + ((t2l >>> 0) < (sigma0l >>> 0) ? 1 : 0)
+    var t2l = (sigma0l + majl) | 0
+    var t2h = (sigma0h + majh + getCarry(t2l, sigma0l)) | 0
 
-    h = g
+    hh = gh
     hl = gl
-    g = f
+    gh = fh
     gl = fl
-    f = e
+    fh = eh
     fl = el
     el = (dl + t1l) | 0
-    e = (d + t1 + ((el >>> 0) < (dl >>> 0) ? 1 : 0)) | 0
-    d = c
+    eh = (dh + t1h + getCarry(el, dl)) | 0
+    dh = ch
     dl = cl
-    c = b
+    ch = bh
     cl = bl
-    b = a
+    bh = ah
     bl = al
     al = (t1l + t2l) | 0
-    a = (t1 + t2 + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0
-
-    i++
-    j += 2
-  }
-
-  while (i < 16) {
-    Wi = M.readInt32BE(j * 4)
-    Wil = M.readInt32BE(j * 4 + 4)
-
-    loop()
-  }
-
-  while (i < 80) {
-    calcW()
-    loop()
+    ah = (t1h + t2h + getCarry(al, t1l)) | 0
   }
 
   this._al = (this._al + al) | 0
@@ -233,14 +226,14 @@ Sha512.prototype._update = function (M) {
   this._gl = (this._gl + gl) | 0
   this._hl = (this._hl + hl) | 0
 
-  this._a = (this._a + a + ((this._al >>> 0) < (al >>> 0) ? 1 : 0)) | 0
-  this._b = (this._b + b + ((this._bl >>> 0) < (bl >>> 0) ? 1 : 0)) | 0
-  this._c = (this._c + c + ((this._cl >>> 0) < (cl >>> 0) ? 1 : 0)) | 0
-  this._d = (this._d + d + ((this._dl >>> 0) < (dl >>> 0) ? 1 : 0)) | 0
-  this._e = (this._e + e + ((this._el >>> 0) < (el >>> 0) ? 1 : 0)) | 0
-  this._f = (this._f + f + ((this._fl >>> 0) < (fl >>> 0) ? 1 : 0)) | 0
-  this._g = (this._g + g + ((this._gl >>> 0) < (gl >>> 0) ? 1 : 0)) | 0
-  this._h = (this._h + h + ((this._hl >>> 0) < (hl >>> 0) ? 1 : 0)) | 0
+  this._ah = (this._ah + ah + getCarry(this._al, al)) | 0
+  this._bh = (this._bh + bh + getCarry(this._bl, bl)) | 0
+  this._ch = (this._ch + ch + getCarry(this._cl, cl)) | 0
+  this._dh = (this._dh + dh + getCarry(this._dl, dl)) | 0
+  this._eh = (this._eh + eh + getCarry(this._el, el)) | 0
+  this._fh = (this._fh + fh + getCarry(this._fl, fl)) | 0
+  this._gh = (this._gh + gh + getCarry(this._gl, gl)) | 0
+  this._hh = (this._hh + hh + getCarry(this._hl, hl)) | 0
 }
 
 Sha512.prototype._hash = function () {
@@ -251,14 +244,14 @@ Sha512.prototype._hash = function () {
     H.writeInt32BE(l, offset + 4)
   }
 
-  writeInt64BE(this._a, this._al, 0)
-  writeInt64BE(this._b, this._bl, 8)
-  writeInt64BE(this._c, this._cl, 16)
-  writeInt64BE(this._d, this._dl, 24)
-  writeInt64BE(this._e, this._el, 32)
-  writeInt64BE(this._f, this._fl, 40)
-  writeInt64BE(this._g, this._gl, 48)
-  writeInt64BE(this._h, this._hl, 56)
+  writeInt64BE(this._ah, this._al, 0)
+  writeInt64BE(this._bh, this._bl, 8)
+  writeInt64BE(this._ch, this._cl, 16)
+  writeInt64BE(this._dh, this._dl, 24)
+  writeInt64BE(this._eh, this._el, 32)
+  writeInt64BE(this._fh, this._fl, 40)
+  writeInt64BE(this._gh, this._gl, 48)
+  writeInt64BE(this._hh, this._hl, 56)
 
   return H
 }

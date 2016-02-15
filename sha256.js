@@ -41,39 +41,39 @@ function Sha256 () {
 inherits(Sha256, Hash)
 
 Sha256.prototype.init = function () {
-  this._a = 0x6a09e667 | 0
-  this._b = 0xbb67ae85 | 0
-  this._c = 0x3c6ef372 | 0
-  this._d = 0xa54ff53a | 0
-  this._e = 0x510e527f | 0
-  this._f = 0x9b05688c | 0
-  this._g = 0x1f83d9ab | 0
-  this._h = 0x5be0cd19 | 0
+  this._a = 0x6a09e667
+  this._b = 0xbb67ae85
+  this._c = 0x3c6ef372
+  this._d = 0xa54ff53a
+  this._e = 0x510e527f
+  this._f = 0x9b05688c
+  this._g = 0x1f83d9ab
+  this._h = 0x5be0cd19
 
   return this
 }
 
-function Ch (x, y, z) {
+function ch (x, y, z) {
   return z ^ (x & (y ^ z))
 }
 
-function Maj (x, y, z) {
+function maj (x, y, z) {
   return (x & y) | (z & (x | y))
 }
 
-function Sigma0 (x) {
+function sigma0 (x) {
   return (x >>> 2 | x << 30) ^ (x >>> 13 | x << 19) ^ (x >>> 22 | x << 10)
 }
 
-function Sigma1 (x) {
+function sigma1 (x) {
   return (x >>> 6 | x << 26) ^ (x >>> 11 | x << 21) ^ (x >>> 25 | x << 7)
 }
 
-function Gamma0 (x) {
+function gamma0 (x) {
   return (x >>> 7 | x << 25) ^ (x >>> 18 | x << 14) ^ (x >>> 3)
 }
 
-function Gamma1 (x) {
+function gamma1 (x) {
   return (x >>> 17 | x << 15) ^ (x >>> 19 | x << 13) ^ (x >>> 10)
 }
 
@@ -89,29 +89,22 @@ Sha256.prototype._update = function (M) {
   var g = this._g | 0
   var h = this._h | 0
 
-  var j = 0
+  for (var i = 0; i < 16; ++i) W[i] = M.readInt32BE(i * 4)
+  for (; i < 64; ++i) W[i] = (gamma1(W[i - 2]) + W[i - 7] + gamma0(W[i - 15]) + W[i - 16]) | 0
 
-  function calcW () { return Gamma1(W[j - 2]) + W[j - 7] + Gamma0(W[j - 15]) + W[j - 16] }
-  function loop (w) {
-    W[j] = w
-
-    var T1 = h + Sigma1(e) + Ch(e, f, g) + K[j] + w
-    var T2 = Sigma0(a) + Maj(a, b, c)
+  for (var j = 0; j < 64; ++j) {
+    var T1 = (h + sigma1(e) + ch(e, f, g) + K[j] + W[j]) | 0
+    var T2 = (sigma0(a) + maj(a, b, c)) | 0
 
     h = g
     g = f
     f = e
-    e = d + T1
+    e = (d + T1) | 0
     d = c
     c = b
     b = a
-    a = T1 + T2
-
-    j++
+    a = (T1 + T2) | 0
   }
-
-  while (j < 16) loop(M.readInt32BE(j * 4))
-  while (j < 64) loop(calcW())
 
   this._a = (a + this._a) | 0
   this._b = (b + this._b) | 0

@@ -9,6 +9,10 @@
 var inherits = require('inherits')
 var Hash = require('./hash')
 
+var K = [
+  0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0
+]
+
 var W = new Array(80)
 
 function Sha () {
@@ -21,61 +25,51 @@ function Sha () {
 inherits(Sha, Hash)
 
 Sha.prototype.init = function () {
-  this._a = 0x67452301 | 0
-  this._b = 0xefcdab89 | 0
-  this._c = 0x98badcfe | 0
-  this._d = 0x10325476 | 0
-  this._e = 0xc3d2e1f0 | 0
+  this._a = 0x67452301
+  this._b = 0xefcdab89
+  this._c = 0x98badcfe
+  this._d = 0x10325476
+  this._e = 0xc3d2e1f0
 
   return this
 }
 
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-function rol (num, cnt) {
-  return (num << cnt) | (num >>> (32 - cnt))
+function rotl5 (num) {
+  return (num << 5) | (num >>> 27)
+}
+
+function rotl30 (num) {
+  return (num << 30) | (num >>> 2)
+}
+
+function ft (s, b, c, d) {
+  if (s === 0) return (b & c) | ((~b) & d)
+  if (s === 2) return (b & c) | (b & d) | (c & d)
+  return b ^ c ^ d
 }
 
 Sha.prototype._update = function (M) {
   var W = this._w
 
-  var a = this._a
-  var b = this._b
-  var c = this._c
-  var d = this._d
-  var e = this._e
+  var a = this._a | 0
+  var b = this._b | 0
+  var c = this._c | 0
+  var d = this._d | 0
+  var e = this._e | 0
 
-  var j = 0
-  var k
+  for (var i = 0; i < 16; ++i) W[i] = M.readInt32BE(i * 4)
+  for (; i < 80; ++i) W[i] = W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16]
 
-  /*
-   * SHA-1 has a bitwise rotate left operation. But, SHA is not
-   * function calcW() { return rol(W[j - 3] ^ W[j -  8] ^ W[j - 14] ^ W[j - 16], 1) }
-   */
-  function calcW () { return W[j - 3] ^ W[j - 8] ^ W[j - 14] ^ W[j - 16] }
-  function loop (w, f) {
-    W[j] = w
-
-    var t = rol(a, 5) + f + e + w + k
+  for (var j = 0; j < 80; ++j) {
+    var s = ~~(j / 20)
+    var t = (rotl5(a) + ft(s, b, c, d) + e + W[j] + K[s]) | 0
 
     e = d
     d = c
-    c = rol(b, 30)
+    c = rotl30(b)
     b = a
     a = t
-    j++
   }
-
-  k = 1518500249
-  while (j < 16) loop(M.readInt32BE(j * 4), (b & c) | ((~b) & d))
-  while (j < 20) loop(calcW(), (b & c) | ((~b) & d))
-  k = 1859775393
-  while (j < 40) loop(calcW(), b ^ c ^ d)
-  k = -1894007588
-  while (j < 60) loop(calcW(), (b & c) | (b & d) | (c & d))
-  k = -899497514
-  while (j < 80) loop(calcW(), b ^ c ^ d)
 
   this._a = (a + this._a) | 0
   this._b = (b + this._b) | 0
@@ -97,4 +91,3 @@ Sha.prototype._hash = function () {
 }
 
 module.exports = Sha
-
