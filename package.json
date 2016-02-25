@@ -1,7 +1,7 @@
 {
   "name": "sha.js",
   "description": "Streamable SHA hashes in pure javascript",
-  "version": "2.4.4",
+  "version": "2.4.5",
   "homepage": "https://github.com/crypto-browserify/sha.js",
   "repository": {
     "type": "git",
