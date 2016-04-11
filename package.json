@@ -14,7 +14,11 @@
   "homepage": "https://github.com/crypto-browserify/sha.js",
   "license": "MIT",
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
-  "main": "index.js",
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/crypto-browserify/sha.js.git"
