@@ -1,6 +1,5 @@
 var tape = require('tape')
 var vectors = require('hash-test-vectors')
-// var from = require('bops/typedarray/from')
 var Buffer = require('buffer').Buffer
 var hexpp = require('../hexpp')
 
