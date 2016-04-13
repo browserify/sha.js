@@ -7,9 +7,9 @@ var exports = module.exports = function SHA (algorithm) {
   return new Algorithm()
 }
 
-exports.sha = require('./sha')
-exports.sha1 = require('./sha1')
-exports.sha224 = require('./sha224')
-exports.sha256 = require('./sha256')
-exports.sha384 = require('./sha384')
-exports.sha512 = require('./sha512')
+exports.sha = require('./lib/sha')
+exports.sha1 = require('./lib/sha1')
+exports.sha224 = require('./lib/sha224')
+exports.sha256 = require('./lib/sha256')
+exports.sha384 = require('./lib/sha384')
+exports.sha512 = require('./lib/sha512')
