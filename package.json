@@ -29,6 +29,7 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
+    "hash-base": "^2.0.0",
     "inherits": "^2.0.1"
   },
   "devDependencies": {
