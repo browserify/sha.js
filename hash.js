@@ -53,13 +53,13 @@ Hash.prototype.digest = function (enc) {
     this._block.fill(0)
   }
 
-  var maxUint32 = Math.pow(2, 32);
+  var maxUint32 = Math.pow(2, 32)
   if (l < maxUint32) {
-    this._block.writeUInt32BE(l, this._blockSize - 4);
+    this._block.writeUInt32BE(l, this._blockSize - 4)
   } else {
-    var ll = l & 0xffffffff;
-    this._block.writeUInt32BE((l - ll) / maxUint32, this._blockSize - 8);
-    this._block.writeUInt32BE(ll, this._blockSize - 4);
+    var ll = l & 0xffffffff
+    this._block.writeUInt32BE((l - ll) / maxUint32, this._blockSize - 8)
+    this._block.writeUInt32BE(ll, this._blockSize - 4)
   }
 
   var hash = this._update(this._block) || this._hash()
