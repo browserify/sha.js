@@ -83,3 +83,18 @@ tape('hex encoding', function (t) {
 
   t.end()
 })
+
+tape('call digest for more than MAX_UINT32 bits of data', function (t) {
+  var _hash = crypto.createHash('sha1')
+  var hash = new Sha1()
+  var bigData = new Buffer(Math.pow(2, 32) / 8)
+
+  hash.update(bigData)
+  _hash.update(bigData)
+
+  var a = hash.digest('hex')
+  var e = _hash.digest('hex')
+
+  t.equal(a, e)
+  t.end()
+})
