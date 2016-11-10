@@ -1,5 +1,5 @@
 var exports = module.exports = function SHA (algorithm) {
-  algorithm = algorithm.toLowerCase()
+  algorithm = algorithm.toUpperCase()
 
   var Algorithm = exports[algorithm]
   if (!Algorithm) throw new Error(algorithm + ' is not supported (we accept pull requests)')
@@ -7,9 +7,9 @@ var exports = module.exports = function SHA (algorithm) {
   return new Algorithm()
 }
 
-exports.sha = require('./sha')
-exports.sha1 = require('./sha1')
-exports.sha224 = require('./sha224')
-exports.sha256 = require('./sha256')
-exports.sha384 = require('./sha384')
-exports.sha512 = require('./sha512')
+exports.SHA = require('./lib/sha')
+exports.SHA1 = require('./lib/sha1')
+exports.SHA224 = require('./lib/sha224')
+exports.SHA256 = require('./lib/sha256')
+exports.SHA384 = require('./lib/sha384')
+exports.SHA512 = require('./lib/sha512')
