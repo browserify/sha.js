@@ -6,6 +6,12 @@ Streamable SHA hashes in pure javascript.
 [![NPM](http://img.shields.io/npm/v/sha.js.svg)](https://www.npmjs.org/package/sha.js)
 
 
+## Installing with [NPM](https://npmjs.org/ "NPM")
+
+```
+$ npm install sha.js
+```
+
 ## Example
 
 ``` js
