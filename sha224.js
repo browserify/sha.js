@@ -9,6 +9,7 @@
 var inherits = require('inherits')
 var Sha256 = require('./sha256')
 var Hash = require('./hash')
+var Buffer = require('buffer/').Buffer
 
 var W = new Array(64)
 

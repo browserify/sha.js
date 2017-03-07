@@ -1,3 +1,5 @@
+var Buffer = require('buffer/').Buffer
+
 // prototype class for hash functions
 function Hash (blockSize, finalSize) {
   this._block = new Buffer(blockSize)
