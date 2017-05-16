@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "inherits": "^2.0.1",
-    "buffer": "^2.3.4"
   },
   "devDependencies": {
     "buffer": "~2.3.2",
