@@ -56,8 +56,13 @@ Hash.prototype.digest = function (enc) {
   }
 
   // to this append the block which is equal to the number l written in binary
-  // TODO: handle case where l is > Math.pow(2, 29)
-  this._block.writeInt32BE(l, this._blockSize - 4)
+  if (l <= 0xffffffff) {
+    this._block.writeUInt32BE(l, this._blockSize - 4)
+  } else {
+    var ll = l & 0xffffffff
+    this._block.writeUInt32BE((l - ll) / 0x100000000, this._blockSize - 8)
+    this._block.writeUInt32BE(ll, this._blockSize - 4)
+  }
 
   var hash = this._update(this._block) || this._hash()
 
