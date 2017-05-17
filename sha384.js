@@ -1,7 +1,7 @@
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
 var Hash = require('./hash')
-var Buffer = require('buffer/').Buffer
+var Buffer = require('buffer').Buffer
 
 var W = new Array(160)
 

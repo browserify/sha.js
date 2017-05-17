@@ -8,7 +8,7 @@
 
 var inherits = require('inherits')
 var Hash = require('./hash')
-var Buffer = require('buffer/').Buffer
+var Buffer = require('buffer').Buffer
 
 var K = [
   0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0
