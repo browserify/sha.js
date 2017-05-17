@@ -8,7 +8,7 @@
     "url": "git://github.com/crypto-browserify/sha.js.git"
   },
   "dependencies": {
-    "inherits": "^2.0.1",
+    "inherits": "^2.0.1"
   },
   "devDependencies": {
     "buffer": "~2.3.2",
