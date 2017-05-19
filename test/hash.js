@@ -43,7 +43,6 @@ var long = {
 
 function makeTest (name, data) {
   tape(name, function (t) {
-
     var h = new Hash(16, 8)
     var hash = new Buffer(20)
     var n = 2
@@ -57,7 +56,8 @@ function makeTest (name, data) {
       if (n < 0) {
         throw new Error('expecting only 2 calls to _update')
       }
-
+    }
+    h._hash = function () {
       return hash
     }
 

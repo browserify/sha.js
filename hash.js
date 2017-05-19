@@ -64,7 +64,8 @@ Hash.prototype.digest = function (enc) {
     this._block.writeUInt32BE(ll, this._blockSize - 4)
   }
 
-  var hash = this._update(this._block) || this._hash()
+  this._update(this._block)
+  var hash = this._hash()
 
   return enc ? hash.toString(enc) : hash
 }
