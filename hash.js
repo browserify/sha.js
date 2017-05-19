@@ -6,7 +6,6 @@ function Hash (blockSize, finalSize) {
   this._finalSize = finalSize
   this._blockSize = blockSize
   this._len = 0
-  this._s = 0
 }
 
 Hash.prototype.update = function (data, enc) {
@@ -15,8 +14,8 @@ Hash.prototype.update = function (data, enc) {
     data = new Buffer(data, enc)
   }
 
+  var s = this._len
   var l = this._len += data.length
-  var s = this._s || 0
   var f = 0
   var buffer = this._block
 
@@ -35,7 +34,6 @@ Hash.prototype.update = function (data, enc) {
       this._update(buffer)
     }
   }
-  this._s = s
 
   return this
 }
