@@ -17,7 +17,7 @@ var count16 = {
   strings: ['0A1B2C3D4E5F6G7H'],
   buffers: [
     hexBuf,
-    new Buffer([ 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
+    new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
   ]
 }
 
@@ -29,12 +29,12 @@ var empty = {
 }
 
 var multi = {
-      strings: ['abcd', 'efhijk', 'lmnopq'],
-      buffers: [
-        new Buffer('abcdefhijklmnopq', 'ascii'),
-        new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
-      ]
-    }
+  strings: ['abcd', 'efhijk', 'lmnopq'],
+  buffers: [
+    new Buffer('abcdefhijklmnopq', 'ascii'),
+    new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
+  ]
+}
 
 var long = {
   strings: [hex + hex],
