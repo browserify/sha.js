@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "inherits": "^2.0.1",
-    "buffer": "^2.3.4"
+    "safe-buffer": "^5.0.1"
   },
   "devDependencies": {
     "buffer": "~2.3.2",
