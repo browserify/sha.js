@@ -1,8 +1,7 @@
 var tape = require('tape')
 var vectors = require('hash-test-vectors')
 // var from = require('bops/typedarray/from')
-var Buffer = require('buffer').Buffer
-var hexpp = require('../hexpp')
+var Buffer = require('safe-buffer').Buffer
 
 var createHash = require('../')
 
@@ -14,7 +13,6 @@ function makeTest (alg, i, verbose) {
       console.log(v)
       console.log('VECTOR', i)
       console.log('INPUT', v.input)
-      console.log(hexpp(new Buffer(v.input, 'base64')))
       console.log(new Buffer(v.input, 'base64').toString('hex'))
     }
 

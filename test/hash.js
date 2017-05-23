@@ -1,4 +1,3 @@
-var hexpp = require('../hexpp').defaults({ bigendian: false })
 var tape = require('tape')
 var Hash = require('../hash')
 
@@ -6,48 +5,44 @@ var hex = '0A1B2C3D4E5F6G7H'
 
 function equal (t, a, b) {
   t.equal(a.length, b.length)
-
-  for (var i = 0; i < a.length; i++) {
-    t.equal(a[i], b[i])
-  }
+  t.equal(a.toString('hex'), b.toString('hex'))
 }
 
-var hexBuf = new Buffer([48, 65, 49, 66, 50, 67, 51, 68, 52, 69, 53, 70, 54, 71, 55, 72])
+var hexBuf = new Buffer('0A1B2C3D4E5F6G7H', 'utf8')
 var count16 = {
   strings: ['0A1B2C3D4E5F6G7H'],
   buffers: [
     hexBuf,
-    new Buffer([ 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
+    new Buffer('80000000000000000000000000000080', 'hex')
   ]
 }
 
 var empty = {
   strings: [''],
   buffers: [
-    new Buffer([ 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
+    new Buffer('80000000000000000000000000000000', 'hex')
   ]
 }
 
 var multi = {
-      strings: ['abcd', 'efhijk', 'lmnopq'],
-      buffers: [
-        new Buffer('abcdefhijklmnopq', 'ascii'),
-        new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128])
-      ]
-    }
+  strings: ['abcd', 'efhijk', 'lmnopq'],
+  buffers: [
+    new Buffer('abcdefhijklmnopq', 'ascii'),
+    new Buffer('80000000000000000000000000000080', 'hex')
+  ]
+}
 
 var long = {
   strings: [hex + hex],
   buffers: [
     hexBuf,
     hexBuf,
-    new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
+    new Buffer('80000000000000000000000000000100', 'hex')
   ]
 }
 
 function makeTest (name, data) {
   tape(name, function (t) {
-
     var h = new Hash(16, 8)
     var hash = new Buffer(20)
     var n = 2
@@ -56,18 +51,13 @@ function makeTest (name, data) {
 
     h._update = function (block) {
       var e = expected.shift()
-
-      console.log('---block---')
-      console.log(hexpp(block), block.length)
-      console.log('---e---')
-      console.log(hexpp(e), block.length)
-      console.log(block)
       equal(t, block, e)
 
       if (n < 0) {
         throw new Error('expecting only 2 calls to _update')
       }
-
+    }
+    h._hash = function () {
       return hash
     }
 
