@@ -1,6 +1,5 @@
 var tape = require('tape')
 var Hash = require('../hash')
-
 var hex = '0A1B2C3D4E5F6G7H'
 
 function equal (t, a, b) {
@@ -8,27 +7,27 @@ function equal (t, a, b) {
   t.equal(a.toString('hex'), b.toString('hex'))
 }
 
-var hexBuf = new Buffer('0A1B2C3D4E5F6G7H', 'utf8')
+var hexBuf = Buffer.from('0A1B2C3D4E5F6G7H', 'utf8')
 var count16 = {
   strings: ['0A1B2C3D4E5F6G7H'],
   buffers: [
     hexBuf,
-    new Buffer('80000000000000000000000000000080', 'hex')
+    Buffer.from('80000000000000000000000000000080', 'hex')
   ]
 }
 
 var empty = {
   strings: [''],
   buffers: [
-    new Buffer('80000000000000000000000000000000', 'hex')
+    Buffer.from('80000000000000000000000000000000', 'hex')
   ]
 }
 
 var multi = {
   strings: ['abcd', 'efhijk', 'lmnopq'],
   buffers: [
-    new Buffer('abcdefhijklmnopq', 'ascii'),
-    new Buffer('80000000000000000000000000000080', 'hex')
+    Buffer.from('abcdefhijklmnopq', 'ascii'),
+    Buffer.from('80000000000000000000000000000080', 'hex')
   ]
 }
 
@@ -37,14 +36,14 @@ var long = {
   buffers: [
     hexBuf,
     hexBuf,
-    new Buffer('80000000000000000000000000000100', 'hex')
+    Buffer.from('80000000000000000000000000000100', 'hex')
   ]
 }
 
 function makeTest (name, data) {
   tape(name, function (t) {
     var h = new Hash(16, 8)
-    var hash = new Buffer(20)
+    var hash = Buffer.alloc(20)
     var n = 2
     var expected = data.buffers.slice()
     // t.plan(expected.length + 1)

@@ -71,8 +71,8 @@ tape('hex encoding', function (t) {
 
     for (var i = 0; i < v[0].length; i = (i + 1) * 2) {
       var s = v[0].substring(i, (i + 1) * 2)
-      hash.update(new Buffer(s, 'ascii').toString('hex'), 'hex')
-      _hash.update(new Buffer(s, 'ascii').toString('hex'), 'hex')
+      hash.update(Buffer.from(s, 'ascii').toString('hex'), 'hex')
+      _hash.update(Buffer.from(s, 'ascii').toString('hex'), 'hex')
     }
     var a = hash.digest('hex')
     var e = _hash.digest('hex')
@@ -87,7 +87,7 @@ tape('hex encoding', function (t) {
 tape('call digest for more than MAX_UINT32 bits of data', function (t) {
   var _hash = crypto.createHash('sha1')
   var hash = new Sha1()
-  var bigData = new Buffer(Math.pow(2, 32) / 8)
+  var bigData = Buffer.alloc(Math.pow(2, 32) / 8)
 
   hash.update(bigData)
   _hash.update(bigData)
