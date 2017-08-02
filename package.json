@@ -18,6 +18,7 @@
     "tape": "~2.3.2",
     "typedarray": "0.0.6"
   },
+  "main": "index.js",
   "bin": "./bin.js",
   "scripts": {
     "prepublish": "npm ls && npm run unit",
