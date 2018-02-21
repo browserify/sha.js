@@ -26,5 +26,5 @@
     "unit": "set -e; for t in test/*.js; do node $t; done;"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
-  "license": "MIT"
+  "license": "(MIT AND BSD-3-Clause)"
 }
