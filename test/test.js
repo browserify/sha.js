@@ -1,6 +1,7 @@
 var crypto = require('crypto')
 var tape = require('tape')
 var Sha1 = require('../').sha1
+var sha = require('../')
 
 var inputs = [
   ['', 'ascii'],
@@ -20,6 +21,21 @@ tape("hash is the same as node's crypto", function (t) {
     var e = crypto.createHash('sha1').update(v[0], v[1]).digest('hex')
     console.log(a, '==', e)
     t.equal(a, e)
+  })
+
+  t.end()
+})
+
+tape("hash is the same as node's crypto for all algos provided by node", function (t) {
+  var hashes = crypto.getHashes()
+  Object.keys(sha).forEach(function (alg) {
+    if (hashes.indexOf(alg) === -1) return // skip unsupported by current Node.js version
+    inputs.forEach(function (v) {
+      var a = new sha[alg]().update(v[0], v[1]).digest('hex')
+      var e = crypto.createHash(alg).update(v[0], v[1]).digest('hex')
+      console.log(alg, a, '==', e)
+      t.equal(a, e)
+    })
   })
 
   t.end()
