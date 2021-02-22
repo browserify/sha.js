@@ -1,10 +1,8 @@
-/**
- * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
- * in FIPS 180-2
- * Version 2.2-beta Copyright Angel Marin, Paul Johnston 2000 - 2009.
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- *
- */
+// Copyright (c) 2013-2018 sha.js contributors
+// Copyright (c) 1998 - 2009, Paul Johnston & Contributors
+//   All rights reserved.
+// 
+// See LICENSE file for license text
 
 var inherits = require('inherits')
 var Sha256 = require('./sha256')
