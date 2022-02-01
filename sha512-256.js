@@ -15,7 +15,7 @@ function Sha512h256 () {
 inherits(Sha512h256, Sha512)
 
 Sha512h256.prototype.init = function () {
-  this._ah = 0x22312194
+  this._ah = 0x22312195
   this._bh = 0x9f555fa3
   this._ch = 0x2393b86b
   this._dh = 0x96387719

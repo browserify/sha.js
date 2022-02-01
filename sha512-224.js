@@ -26,7 +26,7 @@ Sha512h256.prototype.init = function () {
 
   this._al = 0x19544da2
   this._bl = 0x89dcd4d6
-  this._cl = 0x32ff9c82
+  this._cl = 0x32ff9c83
   this._dl = 0x582f9fcf
   this._el = 0x7bd44da8
   this._fl = 0x04c48942
