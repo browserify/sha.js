@@ -41,4 +41,4 @@ It does update incrementally, so you can hash things larger than RAM, as it uses
 This work is derived from Paul Johnston's [A JavaScript implementation of the Secure Hash Algorithm](http://pajhome.org.uk/crypt/md5/sha1.html).
 
 
-## LICENSE [MIT](LICENSE)
+## LICENSE [MIT AND BSD-3-Clause](LICENSE)
