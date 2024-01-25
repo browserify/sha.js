@@ -18,7 +18,9 @@
     "tape": "~2.3.2",
     "typedarray": "0.0.6"
   },
-  "bin": "./bin.js",
+  "bin": {
+    "shajs": "./bin.js"
+  },
   "scripts": {
     "prepublish": "npm ls && npm run unit",
     "lint": "standard",
