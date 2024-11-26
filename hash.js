@@ -1,6 +1,7 @@
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
+var toBuffer = require('to-buffer');
 
 // prototype class for hash functions
 function Hash(blockSize, finalSize) {
@@ -12,10 +13,7 @@ function Hash(blockSize, finalSize) {
 
 Hash.prototype.update = function (data, enc) {
 	/* eslint no-param-reassign: 0 */
-	if (typeof data === 'string') {
-		enc = enc || 'utf8';
-		data = Buffer.from(data, enc);
-	}
+	data = toBuffer(data, enc || 'utf8');
 
 	var block = this._block;
 	var blockSize = this._blockSize;
