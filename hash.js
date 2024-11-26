@@ -2,6 +2,10 @@
 
 var Buffer = require('safe-buffer').Buffer;
 
+var useArrayBuffer = typeof ArrayBuffer !== 'undefined'
+  && typeof Uint8Array !== 'undefined'
+  && ArrayBuffer.isView;
+
 // prototype class for hash functions
 function Hash(blockSize, finalSize) {
 	this._block = Buffer.alloc(blockSize);
@@ -12,9 +16,37 @@ function Hash(blockSize, finalSize) {
 
 Hash.prototype.update = function (data, enc) {
 	/* eslint no-param-reassign: 0 */
-	if (typeof data === 'string') {
+	if (data instanceof Uint8Array) {
+		/*
+		 * Fast path
+		 * Already single-byte wide and 0-255
+		 */
+	} else if (typeof data === 'string') {
 		enc = enc || 'utf8';
 		data = Buffer.from(data, enc);
+	} else if (useArrayBuffer && ArrayBuffer.isView(data)) {
+		// Convert all TypedArray and DataView instances to single-byte-wide Uint8Array views
+		var oldSize = data.byteLength;
+		data = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+
+		if (!(data.byteLength === oldSize && data.byteLength === data.length)) {
+			throw new Error('Unexpected: broken Uint8Array');
+		}
+	} else {
+		if (!data || typeof data !== 'object' || typeof data.length !== 'number') {
+			throw new TypeError('Not an array-like');
+		}
+
+		// non-negative 32-bit integer
+		if ((data.length >>> 0) !== data.length) {
+			throw new RangeError('Invalid length');
+		}
+
+		for (var j = 0; j < data.length; j++) {
+			if ((data[j] & 255) !== data[j]) {
+				throw new TypeError('Not a byte array');
+			}
+		}
 	}
 
 	var block = this._block;

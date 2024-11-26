@@ -60,5 +60,17 @@
 				"max-lines-per-function": "off",
 			},
 		},
+		{
+			"files": "hash.js",
+			"globals": {
+				"Uint8Array": false,
+			},
+		},
+		{
+			"files": "test/test.js",
+			"globals": {
+				"Uint16Array": false,
+			},
+		},
 	],
 }
