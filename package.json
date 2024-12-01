@@ -20,10 +20,11 @@
   },
   "bin": "./bin.js",
   "scripts": {
-    "prepublish": "npm ls && npm run unit",
     "lint": "standard",
-    "test": "npm run lint && npm run unit",
-    "unit": "set -e; for t in test/*.js; do node $t; done;"
+    "pretest": "npm run lint",
+    "test": "npm run tests-only",
+    "tests-only": "tape 'test/**/*.js'",
+    "posttest": "npx npm@'>= 10.2' audit --production"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "license": "(MIT AND BSD-3-Clause)"
