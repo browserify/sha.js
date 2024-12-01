@@ -58,15 +58,11 @@ function makeTest (alg, i, verbose) {
   })
 }
 
-if (process.argv[2]) {
-  makeTest(process.argv[2], parseInt(process.argv[3], 10), true)
-} else {
-  vectors.forEach(function (v, i) {
-    makeTest('sha', i)
-    makeTest('sha1', i)
-    makeTest('sha224', i)
-    makeTest('sha256', i)
-    makeTest('sha384', i)
-    makeTest('sha512', i)
-  })
-}
+vectors.forEach(function (v, i) {
+  makeTest('sha', i)
+  makeTest('sha1', i)
+  makeTest('sha224', i)
+  makeTest('sha256', i)
+  makeTest('sha384', i)
+  makeTest('sha512', i)
+})
