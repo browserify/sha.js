@@ -1,2 +1,7 @@
 node_modules
 npm-debug.log
+
+# Only apps should have lockfiles
+npm-shrinkwrap.json
+package-lock.json
+yarn.lock
