@@ -28,5 +28,8 @@
     "posttest": "npx npm@'>= 10.2' audit --production"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
-  "license": "(MIT AND BSD-3-Clause)"
+  "license": "(MIT AND BSD-3-Clause)",
+  "engines": {
+    "node": ">= 4"
+  }
 }

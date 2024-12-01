@@ -6,6 +6,6 @@ jobs:
   tests:
     uses: ljharb/actions/.github/workflows/node.yml@main
     with:
-      range: '< 10'
+      range: '>= 4 < 10'
       type: minors
       command: npm run tests-only
