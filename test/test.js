@@ -91,7 +91,13 @@ tape('hex encoding', function (t) {
 tape('call digest for more than MAX_UINT32 bits of data', function (t) {
 	var sha1hash = crypto.createHash('sha1');
 	var hash = new Sha1();
-	var bigData = Buffer.alloc(0x1ffffffff / 8);
+	var bigData;
+	try {
+		bigData = Buffer.alloc(0x1ffffffff / 8);
+	} catch (err) {
+		// node < 3 has a lower buffer size limit than node 3+. node 0.10 requires the `/8`, 0.12 - 2 are fine with `-8`
+		bigData = Buffer.alloc(0x3fffffff / 8);
+	}
 
 	hash.update(bigData);
 	sha1hash.update(bigData);
