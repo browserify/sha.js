@@ -1,7 +1,10 @@
 'use strict';
 
 var tape = require('tape');
+var Buffer = require('safe-buffer').Buffer;
+
 var Hash = require('../hash');
+
 var hex = '0A1B2C3D4E5F6G7H';
 
 function equal(t, a, b) {

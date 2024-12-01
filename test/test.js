@@ -2,6 +2,8 @@
 
 var crypto = require('crypto');
 var tape = require('tape');
+var Buffer = require('safe-buffer').Buffer;
+
 var Sha1 = require('../').sha1;
 
 var inputs = [
