@@ -1,41 +1,44 @@
 #! /usr/bin/env node
 
-var createHash = require('./browserify')
-var argv = process.argv.slice(2)
+'use strict';
 
-function pipe (algorithm, s) {
-  var start = Date.now()
-  var hash = createHash(algorithm || 'sha1')
+var createHash = require('./browserify');
+var argv = process.argv.slice(2);
 
-  s.on('data', function (data) {
-    hash.update(data)
-  })
+function pipe(algorithm, s) {
+	var start = Date.now();
+	var hash = createHash(algorithm || 'sha1');
 
-  s.on('end', function () {
-    if (process.env.DEBUG) {
-      return console.log(hash.digest('hex'), Date.now() - start)
-    }
+	s.on('data', function (data) {
+		hash.update(data);
+	});
 
-    console.log(hash.digest('hex'))
-  })
+	s.on('end', function () {
+		if (process.env.DEBUG) {
+			console.log(hash.digest('hex'), Date.now() - start);
+		} else {
+			console.log(hash.digest('hex'));
+		}
+	});
 }
 
-function usage () {
-  console.error('sha.js [algorithm=sha1] [filename] # hash filename with algorithm')
-  console.error('input | sha.js [algorithm=sha1]    # hash stdin with algorithm')
-  console.error('sha.js --help                      # display this message')
+function usage() {
+	console.error('sha.js [algorithm=sha1] [filename] # hash filename with algorithm');
+	console.error('input | sha.js [algorithm=sha1]    # hash stdin with algorithm');
+	console.error('sha.js --help                      # display this message');
 }
 
 if (!process.stdin.isTTY) {
-  pipe(argv[0], process.stdin)
+	pipe(argv[0], process.stdin);
 } else if (argv.length) {
-  if (/--help|-h/.test(argv[0])) {
-    usage()
-  } else {
-    var filename = argv.pop()
-    var algorithm = argv.pop()
-    pipe(algorithm, require('fs').createReadStream(filename))
-  }
+	if ((/--help|-h/).test(argv[0])) {
+		usage();
+	} else {
+		var filename = argv.pop();
+		var algorithm = argv.pop();
+		// eslint-disable-next-line global-require
+		pipe(algorithm, require('fs').createReadStream(filename));
+	}
 } else {
-  usage()
+	usage();
 }
