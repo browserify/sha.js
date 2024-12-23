@@ -36,6 +36,14 @@ console.log(sha256stream.read().toString('hex'))
 Note, this doesn't actually implement a stream, but wrapping this in a stream is trivial.
 It does update incrementally, so you can hash things larger than RAM, as it uses a constant amount of memory (except when using base64 or utf8 encoding, see code comments).
 
+## TypeScript
+
+Library can be used with types, use [`npm i @types/sha.js`](https://www.npmjs.com/package/@types/sha.js) and add `sha.js` under `types` in your `tsconfig.json`. Expected type-checking can be illustrated as follows:
+```ts
+return sha(algorithm as 'sha' | 'sha1' | 'sha224' | 'sha256' | 'sha384' | 'sha512')
+      .update(data as string | NodeJS.ArrayBufferView)
+      .digest(encoding as 'latin1' | 'hex' | 'base64')
+```
 
 ## Acknowledgements
 This work is derived from Paul Johnston's [A JavaScript implementation of the Secure Hash Algorithm](http://pajhome.org.uk/crypt/md5/sha1.html).
