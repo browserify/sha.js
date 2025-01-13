@@ -19,7 +19,9 @@
     "tape": "^5.9.0",
     "typedarray": "^0.0.7"
   },
-  "bin": "./bin.js",
+  "bin": {
+    "shajs": "./bin.js"
+  },
   "scripts": {
     "lint": "eslint --ext=js,mjs .",
     "pretest": "npm run lint",
