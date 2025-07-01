@@ -30,8 +30,7 @@ tape("hash is the same as node's crypto", function (t) {
 	inputs.forEach(function (v) {
 		var a = new Sha1().update(v[0], v[1]).digest('hex');
 		var e = crypto.createHash('sha1').update(v[0], v[1]).digest('hex');
-		console.log(a, '==', e);
-		t.equal(a, e);
+		t.equal(a, e, a + ' == ' + e);
 	});
 
 	t.end();
@@ -50,8 +49,7 @@ tape('call update multiple times', function (t) {
 
 		var a = hash.digest('hex');
 		var e = sha1hash.digest('hex');
-		console.log(a, '==', e);
-		t.equal(a, e);
+		t.equal(a, e, a + ' == ' + e);
 	});
 	t.end();
 });
@@ -89,8 +87,7 @@ tape('hex encoding', function (t) {
 		var a = hash.digest('hex');
 		var e = sha1hash.digest('hex');
 
-		console.log(a, '==', e);
-		t.equal(a, e);
+		t.equal(a, e, a + ' == ' + e);
 	});
 
 	t.end();
@@ -136,6 +133,6 @@ tape('call digest for more than MAX_UINT32 bits of data', function (t) {
 	var a = hash.digest('hex');
 	var e = sha1hash.digest('hex');
 
-	t.equal(a, e);
+	t.equal(a, e, a + ' == ' + e);
 	t.end();
 });

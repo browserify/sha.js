@@ -12,10 +12,10 @@ function makeTest(alg, i, verbose) {
 
 	tape(alg + ': NIST vector ' + i, function (t) {
 		if (verbose) {
-			console.log(v);
-			console.log('VECTOR', i);
-			console.log('INPUT', v.input);
-			console.log(Buffer.from(v.input, 'base64').toString('hex'));
+			t.comment(v);
+			t.comment('VECTOR', i);
+			t.comment('INPUT', v.input);
+			t.comment(Buffer.from(v.input, 'base64').toString('hex'));
 		}
 
 		var buf = Buffer.from(v.input, 'base64');
@@ -26,8 +26,8 @@ function makeTest(alg, i, verbose) {
 		var buf1 = buf.slice(0, i);
 		var buf2 = buf.slice(i, buf.length);
 
-		console.log(buf1.length, buf2.length, buf.length);
-		console.log(createHash(alg)._block.length);
+		t.comment(buf1.length + ', ' + buf2.length + ', ' + buf.length);
+		t.comment(createHash(alg)._block.length);
 
 		t.equal(
 			createHash(alg)
