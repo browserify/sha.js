@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.4.12](https://github.com/browserify/sha.js/compare/v2.4.11...v2.4.12) - 2025-07-01
+
+### Commits
+
+- [eslint] switch to eslint [`7acadfb`](https://github.com/browserify/sha.js/commit/7acadfbd3abb558880212b20669fcb09e1aa1c58)
+- [meta] add `auto-changelog` [`b46e711`](https://github.com/browserify/sha.js/commit/b46e7116ebeaa82f34bbf2d7494fff7ef46eab3e)
+- [eslint] fix package.json indentation [`df9d521`](https://github.com/browserify/sha.js/commit/df9d521e16ddf55dc877c43c05706d43c057fad4)
+- [Tests] migrate from travis to GHA [`c43c64a`](https://github.com/browserify/sha.js/commit/c43c64adc6d3607d470538df72338fc02e63bc24)
+- [Fix] support multi-byte wide typed arrays [`f2a258e`](https://github.com/browserify/sha.js/commit/f2a258e9f2d0fcd113bfbaa49706e1ac0d979ba5)
+- [meta] reorder package.json [`d8d77c0`](https://github.com/browserify/sha.js/commit/d8d77c0a729c99593e304047f9d4335b498fd9ed)
+- [meta] add `npmignore` [`35aec35`](https://github.com/browserify/sha.js/commit/35aec35c667b606b2495be3e4186bbe977b9e087)
+- [Tests] avoid console logs [`73e33ae`](https://github.com/browserify/sha.js/commit/73e33ae0ca6bca232627cac7473028e1d218f67e)
+- [Tests] fix tests run in batch [`2629130`](https://github.com/browserify/sha.js/commit/262913006e94616c8cd245ef6bd61bc4410b29e3)
+- [Tests] drop node requirement to 0.10 [`00c7f23`](https://github.com/browserify/sha.js/commit/00c7f234aa3bdbd427ffeb929bacbb05334eb3e9)
+- [Dev Deps] update `buffer`, `hash-test-vectors`, `standard`, `tape`, `typedarray` [`92b5de5`](https://github.com/browserify/sha.js/commit/92b5de5f67472d9f18413d38ad5b9aba29ff4c22)
+- [Tests] drop node requirement to v3 [`9b5eca8`](https://github.com/browserify/sha.js/commit/9b5eca80fd9bb21cf05bdf43ce42661f1bbafeaa)
+- [meta] set engines to `&gt;= 4` [`807084c`](https://github.com/browserify/sha.js/commit/807084c5c0f943459e89838252cafbd175b549b7)
+- Only apps should have lockfiles [`c72789c`](https://github.com/browserify/sha.js/commit/c72789c7a129cf453d44008ba27a88b90ac7989b)
+- [Deps] update `inherits`, `safe-buffer` [`5428cfc`](https://github.com/browserify/sha.js/commit/5428cfc6f7177ad1a41c837b9387308848db96de)
+- [Dev Deps] update `@ljharb/eslint-config` [`2dbe0aa`](https://github.com/browserify/sha.js/commit/2dbe0aab419e90add5032c70c9663b8fc562adb8)
+- update README to reflect LICENSE [`8938256`](https://github.com/browserify/sha.js/commit/8938256dbb2241a7c749e4a399dbaff48cbe8e95)
+- [Dev Deps] add missing peer dep [`d528896`](https://github.com/browserify/sha.js/commit/d52889688ce524e63570f35e448635a29e6dd791)
+- [Dev Deps] remove unused `buffer` dep [`94ca724`](https://github.com/browserify/sha.js/commit/94ca7247f467ef045f41d534708bf7c700e03828)
+
 ## [v2.4.11](https://github.com/browserify/sha.js/compare/v2.4.10...v2.4.11) - 2018-03-20
 
 ### Merged
