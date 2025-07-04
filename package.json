@@ -26,7 +26,7 @@
 	"dependencies": {
 		"inherits": "^2.0.4",
 		"safe-buffer": "^5.2.1",
-		"to-buffer": "^1.2.0"
+		"to-buffer": "^1.2.1"
 	},
 	"devDependencies": {
 		"@ljharb/eslint-config": "^21.2.0",
